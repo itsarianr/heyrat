@@ -1,0 +1,168 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Tahoma', 'Arial', sans-serif;
+  background-color: #ffffff;
+  color: #000000;
+  direction: rtl;
+  text-align: right;
+  line-height: 2;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+header {
+  border-bottom: 2px solid #000000;
+  padding-bottom: 20px;
+  margin-bottom: 40px;
+}
+
+header h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+header h1 a {
+  color: #000000;
+  text-decoration: none;
+}
+
+header h1 a:hover {
+  text-decoration: underline;
+}
+
+.subtitle {
+  font-size: 1.1em;
+  color: #333333;
+}
+
+main {
+  min-height: 60vh;
+}
+
+.book {
+  margin-bottom: 50px;
+}
+
+.book h2 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.poet {
+  font-size: 1.2em;
+  color: #333333;
+  margin-bottom: 30px;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section h3 {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
+.poem-list {
+  list-style: none;
+  padding-right: 20px;
+}
+
+.poem-list li {
+  margin-bottom: 10px;
+}
+
+.poem-list a {
+  color: #000000;
+  text-decoration: none;
+  font-size: 1.1em;
+  display: inline-block;
+  padding: 5px 0;
+  border-bottom: 1px solid transparent;
+}
+
+.poem-list a:hover {
+  border-bottom: 1px solid #000000;
+}
+
+.breadcrumb {
+  margin-bottom: 30px;
+  font-size: 0.95em;
+  color: #555555;
+}
+
+.breadcrumb a {
+  color: #000000;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb span {
+  margin: 0 8px;
+}
+
+.poem {
+  margin-top: 40px;
+}
+
+.poem h2 {
+  font-size: 2em;
+  margin-bottom: 15px;
+}
+
+.meta {
+  font-size: 1.1em;
+  color: #555555;
+  margin-bottom: 40px;
+}
+
+.separator {
+  margin: 0 10px;
+}
+
+.verses {
+  margin-top: 40px;
+}
+
+.verse {
+  font-size: 1.3em;
+  line-height: 2.5;
+  margin-bottom: 15px;
+  padding-right: 20px;
+}
+
+footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 2px solid #000000;
+  text-align: center;
+  color: #555555;
+}
+
+footer p {
+  font-size: 0.9em;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 15px;
+  }
+  
+  header h1 {
+    font-size: 2em;
+  }
+  
+  .verse {
+    font-size: 1.1em;
+    line-height: 2.2;
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "heyrat",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["persian", "poetry", "farsi", "express", "ejs"],
+  "author": "",
+  "license": "ISC",
+  "description": "Minimal Persian poetry website - monolithic Node.js + Express + EJS app",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  }
+}

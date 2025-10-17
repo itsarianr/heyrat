@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= poem.title %> - حیرت</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <h1><a href="/">حیرت</a></h1>
+    <p class="subtitle">مجموعه اشعار پارسی</p>
+  </header>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="/">خانه</a>
+      <span>←</span>
+      <span><%= book.title %></span>
+      <span>←</span>
+      <span><%= section.title %></span>
+    </nav>
+
+    <article class="poem">
+      <h2><%= poem.title %></h2>
+      <p class="meta">
+        <span class="book-name"><%= book.title %></span>
+        <span class="separator">•</span>
+        <span class="section-name"><%= section.title %></span>
+      </p>
+      
+      <div class="verses">
+        <% poem.verses.forEach(verse => { %>
+          <p class="verse"><%= verse %></p>
+        <% }); %>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <p>حیرت - نمایش ساده اشعار پارسی</p>
+  </footer>
+</body>
+</html>

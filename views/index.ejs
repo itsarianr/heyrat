@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حیرت - شعر پارسی</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <h1>حیرت</h1>
+    <p class="subtitle">مجموعه اشعار پارسی</p>
+  </header>
+
+  <main>
+    <% data.books.forEach(book => { %>
+      <section class="book">
+        <h2><%= book.title %></h2>
+        <p class="poet">از <%= book.poet %></p>
+        
+        <% book.sections.forEach(section => { %>
+          <div class="section">
+            <h3><%= section.title %></h3>
+            <ul class="poem-list">
+              <% section.poems.forEach(poem => { %>
+                <li>
+                  <a href="/poem/<%= book.id %>/<%= section.id %>/<%= poem.id %>">
+                    <%= poem.title %>
+                  </a>
+                </li>
+              <% }); %>
+            </ul>
+          </div>
+        <% }); %>
+      </section>
+    <% }); %>
+  </main>
+
+  <footer>
+    <p>حیرت - نمایش ساده اشعار پارسی</p>
+  </footer>
+</body>
+</html>
