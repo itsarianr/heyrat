@@ -81,36 +81,38 @@ heyrat/
 ├── views/             # EJS templates
 │   ├── index.ejs      # Home page listing all poems
 │   └── poem.ejs       # Individual poem display page
-├── data/              # JSON data files
-│   └── poems.json     # Poem collection data
+├── data/              # JSON data files organized by poet
+│   └── hafez/         # Poet folder (one per poet)
+│       └── divan.json # Book file (one per book)
 └── public/            # Static files
     └── styles.css     # RTL-optimized CSS styling
 ```
 
-## Adding More Poems
+## Adding More Content
 
-To add more poems, edit the `data/poems.json` file following the existing structure:
+### Adding a New Book
+
+To add a new book by an existing poet, create a new JSON file in the poet's folder (e.g., `data/hafez/new-book.json`):
 
 ```json
 {
-  "books": [
+  "id": "book-id",
+  "title": "عنوان کتاب",
+  "poet": {
+    "id": "hafez",
+    "name": "حافظ شیرازی"
+  },
+  "sections": [
     {
-      "id": "unique-book-id",
-      "title": "عنوان کتاب",
-      "poet": "نام شاعر",
-      "sections": [
+      "id": "section-id",
+      "title": "عنوان بخش",
+      "poems": [
         {
-          "id": "unique-section-id",
-          "title": "عنوان بخش",
-          "poems": [
-            {
-              "id": "unique-poem-id",
-              "title": "عنوان شعر",
-              "verses": [
-                "مصرع اول",
-                "مصرع دوم"
-              ]
-            }
+          "id": "poem-id",
+          "title": "عنوان شعر",
+          "couplets": [
+            ["مصرع اول بیت اول", "مصرع دوم بیت اول"],
+            ["مصرع اول بیت دوم", "مصرع دوم بیت دوم"]
           ]
         }
       ]
@@ -118,6 +120,18 @@ To add more poems, edit the `data/poems.json` file following the existing struct
   ]
 }
 ```
+
+### Adding a New Poet
+
+1. Create a new folder in `data/` with the poet's ID (e.g., `data/rumi/`)
+2. Add book JSON files inside that folder following the structure above
+3. The server will automatically detect and load the new poet on restart
+
+### Data Structure Notes
+
+- Each couplet is an array with two verses: `["first verse", "second verse"]`
+- Couplets are displayed side by side on desktop (right-aligned and left-aligned)
+- On mobile, couplets stack vertically while maintaining the alignment
 
 ## License
 

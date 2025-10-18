@@ -16,6 +16,8 @@
     <nav class="breadcrumb">
       <a href="/">خانه</a>
       <span>←</span>
+      <span><%= poet.name %></span>
+      <span>←</span>
       <span><%= book.title %></span>
       <span>←</span>
       <span><%= section.title %></span>
@@ -24,6 +26,8 @@
     <article class="poem">
       <h2><%= poem.title %></h2>
       <p class="meta">
+        <span class="poet-name"><%= poet.name %></span>
+        <span class="separator">•</span>
         <span class="book-name"><%= book.title %></span>
         <span class="separator">•</span>
         <span class="section-name"><%= section.title %></span>
@@ -32,8 +36,8 @@
       <div class="couplets">
         <% poem.couplets.forEach(couplet => { %>
           <div class="couplet">
-            <p class="verse verse-first"><%= couplet.first %></p>
-            <p class="verse verse-second"><%= couplet.second %></p>
+            <p class="verse verse-first"><%= couplet[0] %></p>
+            <p class="verse verse-second"><%= couplet[1] %></p>
           </div>
         <% }); %>
       </div>

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Heyrat is a minimal, monolithic web application for displaying Persian poetry with full right-to-left (RTL) text support. The application serves Persian poems organized by books, sections, and individual poems. It emphasizes simplicity with server-side rendering, no client-side JavaScript, and a clean black-on-white minimalist interface. All content is stored in local JSON files, making the application lightweight and portable.
+Heyrat is a minimal, monolithic web application for displaying Persian poetry with full right-to-left (RTL) text support. The application serves Persian poems organized by poets, books, sections, and individual poems. It emphasizes simplicity with server-side rendering, no client-side JavaScript, and a clean black-on-white minimalist interface. All content is stored in modular JSON files organized by poet, making the application lightweight, portable, and easy to extend.
 
 ## User Preferences
 
@@ -21,23 +21,24 @@ Preferred communication style: Simple, everyday language.
 - Cons: Limited interactivity, full page reloads for navigation
 
 ### Data Storage
-**Decision**: File-based JSON storage for all content  
-**Rationale**: Lightweight, portable, and sufficient for read-only poetry content  
+**Decision**: File-based JSON storage with modular poet/book organization  
+**Rationale**: Lightweight, portable, scalable, and sufficient for read-only poetry content  
 **Structure**:
-- Hierarchical organization: Books → Sections → Poems → Couplets
-- Single `poems.json` file loaded synchronously on each request
-- Schema: Each book contains sections, each section contains poems with couplets (each couplet has two verses: "first" and "second")
-- Couplet Structure: Reflects traditional Persian poetry format (بیت) where each couplet displays two verses side by side
-- Pros: No database setup, easy version control, simple backups, authentic poetry presentation
-- Cons: Not suitable for write-heavy operations, loads entire dataset per request
+- Hierarchical organization: Poets → Books → Sections → Poems → Couplets
+- Folder structure: `data/{poet-id}/{book-id}.json` - each poet has a dedicated folder, each book is a separate JSON file
+- Schema: Each book JSON file contains poet metadata, sections, poems, and couplets (each couplet is an array: [first_verse, second_verse])
+- Couplet Structure: Simple array format `["مصرع اول", "مصرع دوم"]` reflecting traditional Persian poetry format (بیت)
+- Loading: Server scans poet folders on startup and loads all book JSON files into memory
+- Pros: No database setup, easy version control, simple backups, authentic poetry presentation, easy to add new books (just upload a new JSON file)
+- Cons: Not suitable for write-heavy operations, loads entire dataset per request, requires folder scan on startup
 
 ### Routing Strategy
 **Decision**: Hierarchical URL structure matching data organization  
 **Routes**:
-- `/` - Homepage listing all books and sections
-- `/poem/:bookId/:sectionId/:poemId` - Individual poem display
+- `/` - Homepage listing all poets, books, and sections
+- `/poem/:poetId/:bookId/:sectionId/:poemId` - Individual poem display with full hierarchy
 - Static file serving from `/public` directory
-- Pros: RESTful, semantic URLs, clear content hierarchy
+- Pros: RESTful, semantic URLs, clear content hierarchy including poet attribution
 - Cons: Currently no pagination or search functionality
 
 ### Presentation Layer
@@ -55,7 +56,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Error Handling
 **Decision**: Basic 404 responses with Persian error messages  
-**Implementation**: Manual validation of bookId, sectionId, and poemId parameters with localized error messages
+**Implementation**: Manual validation of poetId, bookId, sectionId, and poemId parameters with localized error messages
 
 ## External Dependencies
 

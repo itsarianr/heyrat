@@ -13,26 +13,28 @@
   </header>
 
   <main>
-    <% data.books.forEach(book => { %>
-      <section class="book">
-        <h2><%= book.title %></h2>
-        <p class="poet">از <%= book.poet %></p>
-        
-        <% book.sections.forEach(section => { %>
-          <div class="section">
-            <h3><%= section.title %></h3>
-            <ul class="poem-list">
-              <% section.poems.forEach(poem => { %>
-                <li>
-                  <a href="/poem/<%= book.id %>/<%= section.id %>/<%= poem.id %>">
-                    <%= poem.title %>
-                  </a>
-                </li>
-              <% }); %>
-            </ul>
-          </div>
-        <% }); %>
-      </section>
+    <% data.poets.forEach(poet => { %>
+      <% poet.books.forEach(book => { %>
+        <section class="book">
+          <h2><%= book.title %></h2>
+          <p class="poet">از <%= poet.name %></p>
+          
+          <% book.sections.forEach(section => { %>
+            <div class="section">
+              <h3><%= section.title %></h3>
+              <ul class="poem-list">
+                <% section.poems.forEach(poem => { %>
+                  <li>
+                    <a href="/poem/<%= poet.id %>/<%= book.id %>/<%= section.id %>/<%= poem.id %>">
+                      <%= poem.title %>
+                    </a>
+                  </li>
+                <% }); %>
+              </ul>
+            </div>
+          <% }); %>
+        </section>
+      <% }); %>
     <% }); %>
   </main>
 

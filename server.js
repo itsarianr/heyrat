@@ -11,9 +11,34 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 function loadPoems() {
-  const poemsPath = path.join(__dirname, 'data', 'poems.json');
-  const data = fs.readFileSync(poemsPath, 'utf-8');
-  return JSON.parse(data);
+  const dataPath = path.join(__dirname, 'data');
+  const poets = [];
+  
+  const poetFolders = fs.readdirSync(dataPath, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
+  
+  for (const poetFolder of poetFolders) {
+    const poetPath = path.join(dataPath, poetFolder);
+    const bookFiles = fs.readdirSync(poetPath)
+      .filter(file => file.endsWith('.json'));
+    
+    const books = bookFiles.map(bookFile => {
+      const bookPath = path.join(poetPath, bookFile);
+      const bookData = JSON.parse(fs.readFileSync(bookPath, 'utf-8'));
+      return bookData;
+    });
+    
+    if (books.length > 0) {
+      poets.push({
+        id: poetFolder,
+        name: books[0].poet.name,
+        books: books
+      });
+    }
+  }
+  
+  return { poets };
 }
 
 app.get('/', (req, res) => {
@@ -21,11 +46,16 @@ app.get('/', (req, res) => {
   res.render('index', { data });
 });
 
-app.get('/poem/:bookId/:sectionId/:poemId', (req, res) => {
-  const { bookId, sectionId, poemId } = req.params;
+app.get('/poem/:poetId/:bookId/:sectionId/:poemId', (req, res) => {
+  const { poetId, bookId, sectionId, poemId } = req.params;
   const data = loadPoems();
   
-  const book = data.books.find(b => b.id === bookId);
+  const poet = data.poets.find(p => p.id === poetId);
+  if (!poet) {
+    return res.status(404).send('شاعر یافت نشد');
+  }
+  
+  const book = poet.books.find(b => b.id === bookId);
   if (!book) {
     return res.status(404).send('کتاب یافت نشد');
   }
@@ -40,7 +70,7 @@ app.get('/poem/:bookId/:sectionId/:poemId', (req, res) => {
     return res.status(404).send('شعر یافت نشد');
   }
   
-  res.render('poem', { book, section, poem });
+  res.render('poem', { poet, book, section, poem });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
