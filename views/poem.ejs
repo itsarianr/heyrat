@@ -29,9 +29,12 @@
         <span class="section-name"><%= section.title %></span>
       </p>
       
-      <div class="verses">
-        <% poem.verses.forEach(verse => { %>
-          <p class="verse"><%= verse %></p>
+      <div class="couplets">
+        <% poem.couplets.forEach(couplet => { %>
+          <div class="couplet">
+            <p class="verse verse-first"><%= couplet.first %></p>
+            <p class="verse verse-second"><%= couplet.second %></p>
+          </div>
         <% }); %>
       </div>
     </article>

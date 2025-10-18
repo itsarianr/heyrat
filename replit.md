@@ -24,10 +24,11 @@ Preferred communication style: Simple, everyday language.
 **Decision**: File-based JSON storage for all content  
 **Rationale**: Lightweight, portable, and sufficient for read-only poetry content  
 **Structure**:
-- Hierarchical organization: Books → Sections → Poems
+- Hierarchical organization: Books → Sections → Poems → Couplets
 - Single `poems.json` file loaded synchronously on each request
-- Schema: Each book contains sections, each section contains poems with verses
-- Pros: No database setup, easy version control, simple backups
+- Schema: Each book contains sections, each section contains poems with couplets (each couplet has two verses: "first" and "second")
+- Couplet Structure: Reflects traditional Persian poetry format (بیت) where each couplet displays two verses side by side
+- Pros: No database setup, easy version control, simple backups, authentic poetry presentation
 - Cons: Not suitable for write-heavy operations, loads entire dataset per request
 
 ### Routing Strategy
@@ -47,7 +48,9 @@ Preferred communication style: Simple, everyday language.
 - CSS with `direction: rtl` and `text-align: right`
 - Minimal styling (black text on white background)
 - Font stack: Tahoma, Arial, sans-serif for Persian character support
-- Pros: Accessible, fast, works without JavaScript
+- Couplet Display: Flexbox layout displays two verses side by side (first verse right-aligned, second verse left-aligned)
+- Responsive: Mobile view stacks verses vertically while maintaining RTL text direction
+- Pros: Accessible, fast, works without JavaScript, authentic Persian poetry presentation
 - Cons: Limited to traditional web navigation patterns
 
 ### Error Handling

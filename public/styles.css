@@ -129,15 +129,32 @@ main {
   margin: 0 10px;
 }
 
-.verses {
+.couplets {
   margin-top: 40px;
+}
+
+.couplet {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  gap: 30px;
 }
 
 .verse {
   font-size: 1.3em;
   line-height: 2.5;
-  margin-bottom: 15px;
-  padding-right: 20px;
+  flex: 1;
+  margin: 0;
+}
+
+.verse-first {
+  text-align: right;
+}
+
+.verse-second {
+  text-align: left;
 }
 
 footer {
@@ -159,6 +176,12 @@ footer p {
   
   header h1 {
     font-size: 2em;
+  }
+  
+  .couplet {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
   }
   
   .verse {
