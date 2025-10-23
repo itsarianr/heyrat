@@ -4,8 +4,15 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: 'Ravi';
+  src: url('Ravi-VF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
-  font-family: 'Tahoma', 'Arial', sans-serif;
+  font-family: 'Ravi', 'Arial', sans-serif;
   background-color: #ffffff;
   color: #000000;
   direction: rtl;
@@ -130,22 +137,23 @@ main {
 }
 
 .couplets {
-  margin-top: 40px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .couplet {
   display: flex;
-  flex-direction: row-reverse;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 25px;
+  margin-bottom: 1.5em;
   gap: 30px;
 }
 
 .verse {
+  text-align: justify;
+  text-align-last: center;
   font-size: 1.3em;
   line-height: 2.5;
-  flex: 1;
   margin: 0;
 }
 
