@@ -74,5 +74,5 @@ app.get('/:poetId/:bookId/:sectionId/:poemId', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Heyrat server running on port ${PORT}`);
+  console.log(`Heyran server running on port ${PORT}`);
 });

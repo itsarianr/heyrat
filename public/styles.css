@@ -123,7 +123,7 @@ main {
 
 .poem h2 {
   font-size: 2em;
-  margin-bottom: 15px;
+  margin-bottom: 35px;
 }
 
 .meta {
@@ -185,11 +185,15 @@ footer p {
   header h1 {
     font-size: 2em;
   }
+
+  .poem h2 {
+    font-size: 1.5em;
+  }
   
   .couplet {
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 45px;
   }
   
   .verse {

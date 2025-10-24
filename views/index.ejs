@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>حیرت - شعر پارسی</title>
+  <title>حیران - شعر پارسی</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <header>
-    <h1>حیرت</h1>
+    <h1>حیران</h1>
     <p class="subtitle">مجموعه اشعار پارسی</p>
   </header>
 
@@ -21,12 +21,12 @@
           
           <% book.sections.forEach(section => { %>
             <div class="section">
-              <h3><%= section.title %></h3>
+              <!-- <h3><%= section.title %></h3> -->
               <ul class="poem-list">
                 <% section.poems.forEach(poem => { %>
                   <li>
                     <a href="/<%= poet.id %>/<%= book.id %>/<%= section.id %>/<%= poem.id %>">
-                      <%= poem.title %>
+                      <%= section.title %>
                     </a>
                   </li>
                 <% }); %>
@@ -39,7 +39,7 @@
   </main>
 
   <footer>
-    <p>حیرت - نمایش ساده اشعار پارسی</p>
+    <p>حیران - نمایش ساده اشعار پارسی</p>
   </footer>
 </body>
 </html>

@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= poem.title %> - حیرت</title>
+  <title><%= poem.title %> - حیران</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <header>
-    <h1><a href="/">حیرت</a></h1>
+    <h1><a href="/">حیران</a></h1>
     <p class="subtitle">مجموعه اشعار پارسی</p>
   </header>
 
@@ -19,19 +19,19 @@
       <span><%= poet.name %></span>
       <span>←</span>
       <span><%= book.title %></span>
-      <span>←</span>
-      <span><%= section.title %></span>
+      <!-- <span>←</span>
+      <span><%= section.title %></span> -->
     </nav>
 
     <article class="poem">
-      <h2><%= poem.title %></h2>
-      <p class="meta">
+      <h2><%= section.title %></h2>
+      <!-- <p class="meta">
         <span class="poet-name"><%= poet.name %></span>
         <span class="separator">•</span>
         <span class="book-name"><%= book.title %></span>
         <span class="separator">•</span>
         <span class="section-name"><%= section.title %></span>
-      </p>
+      </p> -->
       
       <div class="couplets">
         <% poem.couplets.forEach(couplet => { %>
@@ -45,7 +45,7 @@
   </main>
 
   <footer>
-    <p>حیرت - نمایش ساده اشعار پارسی</p>
+    <p>حیران - نمایش ساده اشعار پارسی</p>
   </footer>
 </body>
 </html>
