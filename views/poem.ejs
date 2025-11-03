@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= section.title %> - حیران</title>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <header>
@@ -19,8 +19,6 @@
       <span><%= poet.name %></span>
       <span>←</span>
       <span><%= book.title %></span>
-      <!-- <span>←</span>
-      <span><%= section.title %></span> -->
     </nav>
 
     <article class="poem">
@@ -28,14 +26,9 @@
         <button id="start-selection">ساخت تصویر شعر</button>
         <button id="finish-selection" style="display:none;">پایان انتخاب</button>
       </div>
+
       <h2><%= section.title %></h2>
-      <!-- <p class="meta">
-        <span class="poet-name"><%= poet.name %></span>
-        <span class="separator">•</span>
-        <span class="book-name"><%= book.title %></span>
-        <span class="separator">•</span>
-        <span class="section-name"><%= section.title %></span>
-      </p> -->
+
       <p id="selection-hint" class="selection-hint" style="display:none;">
         اکنون می‌توانید ابیاتی را انتخاب کنید
       </p>
@@ -54,90 +47,8 @@
   <footer>
     <p>حیران - نمایش ساده اشعار پارسی</p>
   </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="/client.js"></script>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script>
-  // --- Element references ---
-  const startBtn = document.getElementById('start-selection');
-  const doneBtn = document.getElementById('finish-selection');
-  const couplets = document.querySelectorAll('.couplet');
-  const hint = document.getElementById('selection-hint');
-  const poetName = "<%= poet.name %>"; // From EJS data
-
-  let selecting = false;
-
-  // --- Start selection mode ---
-  startBtn.addEventListener('click', () => {
-    selecting = true;
-    startBtn.style.display = 'none';
-    doneBtn.style.display = 'inline-block';
-
-    // Ensure hint has no leftover fade-out class
-    hint.classList.remove('fade-out');
-    hint.style.display = 'block';
-    // force reflow to ensure animation runs reliably
-    void hint.offsetWidth;
-    hint.classList.add('fade-in');
-
-    couplets.forEach(c => c.classList.add('selectable'));
-  });
-
-  // --- Handle couplet clicks ---
-  couplets.forEach(c => {
-    c.addEventListener('click', () => {
-      if (!selecting) return;
-      c.classList.toggle('selected');
-    });
-  });
-
-  // --- Finish and generate screenshot ---
-  doneBtn.addEventListener('click', async () => {
-    selecting = false;
-    doneBtn.style.display = 'none';
-    startBtn.style.display = 'inline-block';
-
-    // Hide the hint: switch classes and then fully clear it after animation
-    hint.classList.remove('fade-in');
-    hint.classList.add('fade-out');
-    setTimeout(() => {
-      hint.style.display = 'none';
-      hint.classList.remove('fade-out'); // clean up so next run is fresh
-    }, 300);
-
-    // Get selected couplets
-    const selected = Array.from(document.querySelectorAll('.couplet.selected'));
-    if (selected.length === 0) {
-      alert('هیچ بیتی انتخاب نکردی!');
-      couplets.forEach(c => c.classList.remove('selectable', 'selected'));
-      return;
-    }
-
-    // Build screenshot container
-    const container = document.createElement('div');
-    container.className = 'screenshot-container';
-    selected.forEach(c => container.appendChild(c.cloneNode(true)));
-
-    // Add footer (poet name + site info)
-    const footer = document.createElement('div');
-    footer.className = 'screenshot-footer';
-    footer.innerHTML = `
-      <p class="poet-name">${poetName}</p>
-      <p class="site-info">حیران — heyran.ir</p>
-    `;
-    container.appendChild(footer);
-    document.body.appendChild(container);
-
-    // Generate image
-    const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#ffffff' });
-    const link = document.createElement('a');
-    link.download = 'poem.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-
-    // Cleanup
-    container.remove();
-    couplets.forEach(c => c.classList.remove('selected', 'selectable'));
-  });
-</script>
-
 </html>

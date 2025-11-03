@@ -1,20 +1,15 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* --- Base --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 @font-face {
   font-family: 'Ravi';
   src: url('Ravi-VF.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
 }
 
 body {
   font-family: 'Ravi', 'Arial', sans-serif;
-  background-color: #ffffff;
-  color: #000000;
+  background: #fff;
+  color: #000;
   direction: rtl;
   text-align: right;
   line-height: 2;
@@ -23,236 +18,56 @@ body {
   margin: 0 auto;
 }
 
-header {
-  border-bottom: 2px solid #000000;
-  padding-bottom: 20px;
-  margin-bottom: 40px;
-}
+/* --- Header --- */
+header { border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 40px; }
+header h1 { font-size: 2.5em; margin-bottom: 10px; }
+header h1 a { color: #000; text-decoration: none; }
+header h1 a:hover { text-decoration: underline; }
+.subtitle { font-size: 1.1em; color: #333; }
 
-header h1 {
-  font-size: 2.5em;
-  margin-bottom: 10px;
-}
+/* --- Main / breadcrumb --- */
+main { min-height: 60vh; }
+.breadcrumb { margin-bottom: 30px; font-size: 0.95em; color: #555; }
+.breadcrumb a { color: #000; text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { margin: 0 8px; }
 
-header h1 a {
-  color: #000000;
-  text-decoration: none;
-}
+/* --- Poem --- */
+.poem { margin-top: 40px; }
+.poem h2 { font-size: 2em; margin-bottom: 35px; }
 
-header h1 a:hover {
-  text-decoration: underline;
-}
+.couplets { max-width: 800px; margin: 0 auto; }
 
-.subtitle {
-  font-size: 1.1em;
-  color: #333333;
-}
-
-main {
-  min-height: 60vh;
-}
-
-.book {
-  margin-bottom: 50px;
-}
-
-.book h2 {
-  font-size: 2em;
-  margin-bottom: 10px;
-}
-
-.poet {
-  font-size: 1.2em;
-  color: #333333;
-  margin-bottom: 30px;
-}
-
-.section {
-  margin-bottom: 30px;
-}
-
-.section h3 {
-  font-size: 1.5em;
-  margin-bottom: 15px;
-}
-
-.poem-list {
-  list-style: none;
-  padding-right: 20px;
-}
-
-.poem-list li {
-  margin-bottom: 10px;
-}
-
-.poem-list a {
-  color: #000000;
-  text-decoration: none;
-  font-size: 1.1em;
-  display: inline-block;
-  padding: 5px 0;
-  border-bottom: 1px solid transparent;
-}
-
-.poem-list a:hover {
-  border-bottom: 1px solid #000000;
-}
-
-.breadcrumb {
-  margin-bottom: 30px;
-  font-size: 0.95em;
-  color: #555555;
-}
-
-.breadcrumb a {
-  color: #000000;
-  text-decoration: none;
-}
-
-.breadcrumb a:hover {
-  text-decoration: underline;
-}
-
-.breadcrumb span {
-  margin: 0 8px;
-}
-
-.poem {
-  margin-top: 40px;
-}
-
-.poem h2 {
-  font-size: 2em;
-  margin-bottom: 35px;
-}
-
-.meta {
-  font-size: 1.1em;
-  color: #555555;
-  margin-bottom: 40px;
-}
-
-.separator {
-  margin: 0 10px;
-}
-
-.couplets {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
+/* ======= REVERTED ALIGNMENT: original two-verse layout ======= */
 .couplet {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1.5em;
   gap: 30px;
+  /* keep full width and natural sizing */
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Each verse uses natural flow (no fixed widths), justified text like original */
 .verse {
-  text-align: justify;
-  text-align-last: center;
   font-size: 1.3em;
   line-height: 2.5;
   margin: 0;
+  text-align: justify;          /* justify the lines */
+  text-align-last: center;     /* center last line */
+  hyphens: auto;
 }
 
-.verse-first {
-  text-align: right;
-}
+/* explicit directions like the original */
+.verse-first { text-align: right; }
+.verse-second { text-align: left; }
 
-.verse-second {
-  text-align: left;
-}
-
-footer {
-  margin-top: 60px;
-  padding-top: 20px;
-  border-top: 2px solid #000000;
-  text-align: center;
-  color: #555555;
-}
-
-footer p {
-  font-size: 0.9em;
-}
-
-/* Selection mode */
-.couplet.selectable {
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.couplet.selectable:hover {
-  background-color: #f5f5f5;
-}
-
-.couplet.selected {
-  background-color: #ffeaa7;
-  border-radius: 10px;
-}
-
-/* Screenshot container (hidden offscreen) */
-.screenshot-container {
-  position: fixed;
-  top: -10000px;
-  right: 0;
-  background-color: #fff;
-  padding: 40px;
-  font-family: 'Ravi', sans-serif;
-  width: 700px;
-  text-align: center;
-}
-
-/* Remove yellow from final screenshot */
-.couplet.selected {
-  outline: 2px solid #00000020;
-  border-radius: 10px;
-  background-color: #ffffff; /* white background */
-}
-
-/* Screenshot appearance */
-.screenshot-container {
-  position: fixed;
-  top: -10000px;
-  right: 0;
-  background-color: #ffffff;
-  padding: 40px 20px;
-  font-family: 'Ravi', sans-serif;
-  width: 700px;
-  text-align: center;
-  color: #000;
-}
-
-.screenshot-footer {
-  margin-top: 50px;
-  border-top: 1px solid #eee;
-  padding-top: 15px;
-  font-size: 0.9em;
-  color: #555;
-}
-
-.screenshot-footer .poet-name {
-  font-size: 1.1em;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.screenshot-footer .site-info {
-  font-size: 0.9em;
-  color: #777;
-}
-
-/* Screenshot buttons */
-.screenshot-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 25px;
-  justify-content: flex-start;
-}
-
+/* --- Controls (buttons) --- */
+.screenshot-controls { display: flex; gap: 10px; margin-bottom: 25px; }
 .screenshot-controls button {
-  background: transparent;
+  background: #fff;
   border: 1.5px solid #000;
   color: #000;
   padding: 10px 18px;
@@ -260,26 +75,40 @@ footer p {
   font-size: 0.95em;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  line-height: 1.6;
+  transition: all 0.18s ease;
   min-width: 120px;
-  text-align: center;
 }
 
-.screenshot-controls button:hover {
+/* Floating done button */
+#finish-selection {
   background: #000;
   color: #fff;
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
-.screenshot-controls button:active {
-  transform: scale(0.97);
+/* --- Selection visuals (only on page, not in screenshot) --- */
+.couplet.selectable {
+  border: 2px dotted #bbb;
+  border-radius: 10px;
+  padding: 0;                  /* 👈 remove extra padding */
+  outline-offset: 6px;         /* optional: keeps dotted line a bit away from text */
+  transition: border-color 0.18s ease, background 0.18s ease;
+  cursor: pointer;
+}
+.couplet.selectable:hover { border-color: #999; }
+
+.couplet.selected {
+  outline: 1px solid rgba(0,0,0,0.08);
+  background: #dbdbdb; /* keep white */
+  border-radius: 10px;
 }
 
-.screenshot-controls button:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #00000030;
-}
-
+/* --- Hint text --- */
 .selection-hint {
   text-align: center;
   color: #555;
@@ -289,40 +118,85 @@ footer p {
   padding: 8px 15px;
   border-radius: 6px;
   display: inline-block;
+  opacity: 0;
   transition: opacity 0.3s ease;
-  opacity: 0;
+}
+.selection-hint.fade-in { opacity: 1; }
+.selection-hint.fade-out { opacity: 0; }
+
+/* --- Screenshot container (offscreen, dynamic size) --- */
+.screenshot-container {
+  position: fixed;
+  top: -10000px;    /* offscreen */
+  right: 0;
+  background: #fff;
+  padding: 60px 40px;
+  font-family: 'Ravi', sans-serif;
+  display: inline-block;            /* shrink to content (dynamic) */
+  text-align: center;
+  color: #000;
+  overflow: visible;
+  box-shadow: none;
 }
 
-.selection-hint.fade-in {
-  opacity: 1;
+/* Ensure inside screenshot couplets keep the same original layout (no borders, no padding from selection) */
+.screenshot-container .couplet {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+  margin-bottom: 1.5em;
+  border: none !important;     /* remove any selection borders */
+  background: transparent !important;
+  padding: 0 !important;
 }
 
-.selection-hint.fade-out {
-  opacity: 0;
+.screenshot-container .verse {
+  font-size: 1.3em;
+  line-height: 2.5;
+  margin: 0;
+  text-align: justify;
+  text-align-last: center;
+  hyphens: auto;
+  color: #000;
 }
 
+/* Footer in screenshot */
+.screenshot-footer {
+  margin-top: 40px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  font-size: 0.9em;
+  color: #555;
+  text-align: left;
+}
+.screenshot-footer .poet-name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
 
+/* --- Responsive: on small screens keep readable stacked view on page ---- */
 @media (max-width: 600px) {
-  body {
-    padding: 15px;
-  }
-  
-  header h1 {
-    font-size: 2em;
+  body { padding: 15px; }
+  header h1 { font-size: 2em; }
+  .poem h2 { font-size: 1.5em; }
+
+  /* keep on-page couplets stacked (original behavior) */
+  .couplet { flex-direction: column; gap: 10px; }
+  .verse { text-align: center; }
+
+  .screenshot-container .couplet {
+    flex-direction: column;
+    margin-bottom: 4em; /* 👈 more space between couplets */
   }
 
-  .poem h2 {
-    font-size: 1.5em;
+  .screenshot-container .verse {
+    text-align: justify;
+    text-align-last: center;
+    line-height: 2;
   }
-  
-  .couplet {
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 45px;
-  }
-  
-  .verse {
-    font-size: 1.1em;
-    line-height: 2.2;
+
+  .screenshot-container .verse + .verse {
+    margin-top: 0.2em; /* 👈 small gap between the two verses inside each couplet */
   }
 }
