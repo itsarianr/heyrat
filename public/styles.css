@@ -32,6 +32,27 @@ main { min-height: 60vh; }
 .breadcrumb a:hover { text-decoration: underline; }
 .breadcrumb span { margin: 0 8px; }
 
+/* --- Index page styles --- */
+.book { margin-bottom: 50px; }
+.book h2 { font-size: 1.8em; margin-bottom: 8px; }
+.book .poet { color: #333; margin-bottom: 20px; font-size: 0.95em; }
+.section { margin-bottom: 15px; }
+.poem-list { list-style: none; margin: 0; padding: 0; }
+.poem-list li { margin-bottom: 8px; }
+.poem-list a {
+  color: #000;
+  text-decoration: none;
+  display: inline-block;
+  padding: 4px 8px;
+  margin-right: -8px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+.poem-list a:hover {
+  background-color: #f0f0f0;
+}
+
 /* --- Poem --- */
 .poem { margin-top: 40px; }
 .poem h2 { font-size: 2em; margin-bottom: 35px; }
@@ -43,7 +64,7 @@ main { min-height: 60vh; }
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1.5em;
+  margin-bottom: 2em;
   gap: 30px;
   /* keep full width and natural sizing */
   width: 100%;
@@ -95,8 +116,8 @@ main { min-height: 60vh; }
 .couplet.selectable {
   border: 2px dotted #bbb;
   border-radius: 10px;
-  padding: 0;                  /* 👈 remove extra padding */
-  outline-offset: 6px;         /* optional: keeps dotted line a bit away from text */
+  padding: 5px;
+  outline-offset: 6px;
   transition: border-color 0.18s ease, background 0.18s ease;
   cursor: pointer;
 }
@@ -182,7 +203,7 @@ main { min-height: 60vh; }
   .poem h2 { font-size: 1.5em; }
 
   /* keep on-page couplets stacked (original behavior) */
-  .couplet { flex-direction: column; gap: 10px; }
+  .couplet { flex-direction: column; gap: 0; }
   .verse { text-align: center; }
 
   .screenshot-container .couplet {
