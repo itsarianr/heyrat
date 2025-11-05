@@ -40,8 +40,10 @@ if (startBtn) {
 
 // --- Handle couplet clicks ---
 couplets.forEach(c => {
-  c.addEventListener('click', () => {
+  c.addEventListener('click', (e) => {
     if (!selecting) return;
+    // Don't toggle selection if clicking on a button
+    if (e.target.closest('button')) return;
     c.classList.toggle('selected');
   });
 });

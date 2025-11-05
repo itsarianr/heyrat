@@ -20,10 +20,31 @@ body {
 
 /* --- Header --- */
 header { border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 40px; }
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
 header h1 { font-size: 2.5em; margin-bottom: 10px; }
 header h1 a { color: #000; text-decoration: none; }
 header h1 a:hover { text-decoration: underline; }
 .subtitle { font-size: 1.1em; color: #333; }
+.favorites-link {
+  color: #000;
+  text-decoration: none;
+  font-size: 0.95em;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+  margin-top: 8px;
+}
+.favorites-link:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+}
 
 /* --- Main / breadcrumb --- */
 main { min-height: 60vh; }
@@ -57,7 +78,11 @@ main { min-height: 60vh; }
 .poem { margin-top: 40px; }
 .poem h2 { font-size: 2em; margin-bottom: 35px; }
 
-.couplets { max-width: 800px; margin: 0 auto; }
+.couplets { 
+  max-width: 800px; 
+  margin: 0 auto;
+  padding-right: 50px; /* Space for star button on desktop */
+}
 
 /* ======= REVERTED ALIGNMENT: original two-verse layout ======= */
 .couplet {
@@ -69,6 +94,68 @@ main { min-height: 60vh; }
   /* keep full width and natural sizing */
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+}
+
+/* Favorite star button */
+.favorite-btn {
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.favorite-btn:hover {
+  opacity: 0.8;
+  transform: translateY(-50%) scale(1.1);
+}
+.favorite-btn.favorited {
+  opacity: 1;
+}
+.favorite-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+.star-icon {
+  width: 24px;
+  height: 24px;
+  color: #999;
+  stroke: #999;
+  stroke-width: 1.5;
+  fill: none;
+  transition: fill 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              stroke 0.3s ease,
+              transform 0.2s ease;
+}
+.star-icon path {
+  fill: none;
+  transition: fill 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.favorite-btn.favorited .star-icon {
+  color: #999;
+  stroke: #999;
+}
+.favorite-btn.favorited .star-icon path {
+  fill: #999;
+}
+.favorite-btn:hover .star-icon {
+  color: #777;
+  stroke: #777;
+}
+.favorite-btn.favorited:hover .star-icon {
+  color: #777;
+  stroke: #777;
+}
+.favorite-btn.favorited:hover .star-icon path {
+  fill: #777;
 }
 
 /* Each verse uses natural flow (no fixed widths), justified text like original */
@@ -219,5 +306,115 @@ main { min-height: 60vh; }
 
   .screenshot-container .verse + .verse {
     margin-top: 0.2em; /* 👈 small gap between the two verses inside each couplet */
+  }
+  
+  /* Mobile: adjust couplets container and star positioning */
+  .couplets {
+    padding-right: 0; /* No extra padding on mobile */
+  }
+  
+  .couplet {
+    padding-right: 45px; /* Make room for star button to sit outside text */
+  }
+  
+  .favorite-btn {
+    position: absolute;
+    right: 0; /* Position just outside the text area */
+    top: 25px;
+    transform: none;
+    padding: 10px 8px;
+  }
+  .favorite-btn:hover {
+    transform: scale(1.1);
+  }
+  .favorite-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .favorites-link {
+    margin-top: 0;
+    align-self: flex-end;
+  }
+}
+
+/* --- Favorites page --- */
+main h2 {
+  font-size: 2em;
+  margin-bottom: 30px;
+}
+#favorites-container {
+  margin-top: 30px;
+}
+.favorite-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  background: #fff;
+  transition: box-shadow 0.2s ease;
+}
+.favorite-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.favorite-couplet {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+  margin-bottom: 15px;
+}
+.favorite-couplet .verse {
+  font-size: 1.2em;
+  line-height: 2.2;
+  margin: 0;
+  text-align: justify;
+  text-align-last: center;
+}
+.favorite-couplet .verse-first {
+  text-align: right;
+}
+.favorite-couplet .verse-second {
+  text-align: left;
+}
+.favorite-meta {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.favorite-meta .poet-name {
+  font-weight: 500;
+}
+.favorite-meta .separator {
+  color: #999;
+}
+.favorite-link {
+  color: #000;
+  text-decoration: none;
+  font-size: 0.9em;
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.favorite-link:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+}
+
+@media (max-width: 600px) {
+  .favorite-couplet {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .favorite-couplet .verse {
+    text-align: center;
   }
 }

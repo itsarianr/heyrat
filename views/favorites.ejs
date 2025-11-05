@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>علاقه‌مندی‌ها - حیران</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div>
+        <h1><a href="/">حیران</a></h1>
+        <p class="subtitle">مجموعه اشعار پارسی</p>
+      </div>
+      <a href="/favorites" class="favorites-link">علاقه‌مندی‌ها</a>
+    </div>
+  </header>
+
+  <main>
+    <h2>علاقه‌مندی‌ها</h2>
+    
+    <div id="favorites-container">
+      <p id="empty-message" style="display: none; color: #666; margin-top: 20px;">
+        هنوز بیتی به علاقه‌مندی‌ها اضافه نشده است.
+      </p>
+      <div id="favorites-list"></div>
+    </div>
+  </main>
+
+  <footer>
+    <p>حیران - نمایش ساده اشعار پارسی</p>
+  </footer>
+
+  <script src="/favorites.js"></script>
+  <script>
+    function renderFavorites() {
+      const favorites = window.Favorites.getFavorites();
+      const container = document.getElementById('favorites-list');
+      const emptyMessage = document.getElementById('empty-message');
+      
+      const favoriteIds = Object.keys(favorites);
+      
+      if (favoriteIds.length === 0) {
+        emptyMessage.style.display = 'block';
+        container.innerHTML = '';
+        return;
+      }
+      
+      emptyMessage.style.display = 'none';
+      
+      // Sort by poet name, then book title
+      const sortedFavorites = favoriteIds
+        .map(id => ({ id, data: favorites[id] }))
+        .sort((a, b) => {
+          if (a.data.poetName !== b.data.poetName) {
+            return a.data.poetName.localeCompare(b.data.poetName, 'fa');
+          }
+          return a.data.bookTitle.localeCompare(b.data.bookTitle, 'fa');
+        });
+      
+      container.innerHTML = sortedFavorites.map(({ id, data }) => {
+        const url = `/${data.poetId}/${data.bookId}/${data.sectionId}/${data.poemId}`;
+        return `
+          <div class="favorite-card">
+            <div class="favorite-couplet">
+              <p class="verse verse-first">${data.verses[0]}</p>
+              <p class="verse verse-second">${data.verses[1]}</p>
+            </div>
+            <div class="favorite-meta">
+              <span class="poet-name">${data.poetName}</span>
+              <span class="separator">•</span>
+              <span class="book-title">${data.bookTitle}</span>
+            </div>
+            <a href="${url}" class="favorite-link">مشاهده شعر</a>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Render on load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderFavorites);
+    } else {
+      renderFavorites();
+    }
+  </script>
+</body>
+</html>
+

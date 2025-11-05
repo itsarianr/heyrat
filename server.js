@@ -46,6 +46,10 @@ app.get('/', (req, res) => {
   res.render('index', { data });
 });
 
+app.get('/favorites', (req, res) => {
+  res.render('favorites');
+});
+
 app.get('/:poetId/:bookId/:sectionId/:poemId', (req, res) => {
   const { poetId, bookId, sectionId, poemId } = req.params;
   const data = loadPoems();
