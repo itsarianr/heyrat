@@ -13,7 +13,18 @@
         <h1><a href="/">حیران</a></h1>
         <p class="subtitle">مجموعه اشعار پارسی</p>
       </div>
-      <a href="/favorites" class="favorites-link">علاقه‌مندی‌ها</a>
+      <div class="header-actions">
+        <button class="theme-toggle" id="theme-toggle" aria-label="تغییر رنگ پس‌زمینه">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
+          </svg>
+        </button>
+        <div class="color-picker" id="color-picker" style="display: none;">
+          <div class="color-options" id="color-options"></div>
+        </div>
+        <a href="/favorites" class="favorites-link">علاقه‌مندی‌ها</a>
+      </div>
     </div>
   </header>
 
@@ -32,6 +43,8 @@
     <p>حیران - نمایش ساده اشعار پارسی</p>
   </footer>
 
+  <script src="/theme.js"></script>
+  <script src="/color-picker.js"></script>
   <script src="/favorites.js"></script>
   <script>
     function renderFavorites() {

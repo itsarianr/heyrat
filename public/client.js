@@ -35,6 +35,8 @@ if (startBtn) {
     if (doneBtn) doneBtn.style.display = 'inline-block';
     showHint();
     couplets.forEach(c => c.classList.add('selectable'));
+    // Hide favorite buttons during selection
+    document.body.classList.add('selecting-mode');
   });
 }
 
@@ -55,11 +57,14 @@ if (doneBtn) {
     doneBtn.style.display = 'none';
     if (startBtn) startBtn.style.display = 'inline-block';
     hideHint();
+    // Show favorite buttons again
+    document.body.classList.remove('selecting-mode');
 
     const selected = Array.from(document.querySelectorAll('.couplet.selected'));
     if (selected.length === 0) {
       alert('هیچ بیتی انتخاب نکردی!');
       couplets.forEach(c => c.classList.remove('selectable', 'selected'));
+      document.body.classList.remove('selecting-mode');
       return;
     }
 

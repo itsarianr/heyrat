@@ -6,10 +6,15 @@
   src: url('Ravi-VF.ttf') format('truetype');
 }
 
+:root {
+  --theme-bg: #ffffff;
+  --theme-text: #000000;
+}
+
 body {
   font-family: 'Ravi', 'Arial', sans-serif;
-  background: #fff;
-  color: #000;
+  background: var(--theme-bg);
+  color: var(--theme-text);
   direction: rtl;
   text-align: right;
   line-height: 2;
@@ -19,49 +24,137 @@ body {
 }
 
 /* --- Header --- */
-header { border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 40px; }
+header { border-bottom: 2px solid var(--theme-text); padding-bottom: 20px; margin-bottom: 40px; }
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
 }
-header h1 { font-size: 2.5em; margin-bottom: 10px; }
-header h1 a { color: #000; text-decoration: none; }
+header h1 { font-size: 2.5em; margin-bottom: 10px; color: var(--theme-text); }
+header h1 a { color: var(--theme-text); text-decoration: none; }
 header h1 a:hover { text-decoration: underline; }
-.subtitle { font-size: 1.1em; color: #333; }
+.subtitle { font-size: 1.1em; color: var(--theme-text); opacity: 0.8; }
+
+/* Header actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  position: relative;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--theme-text);
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--theme-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  opacity: 0.7;
+}
+.theme-toggle:hover {
+  opacity: 1;
+  background-color: color-mix(in srgb, var(--theme-text) 10%, transparent);
+}
+
+/* Color picker */
+.color-picker {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 10px;
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-text);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--theme-text) 20%, transparent);
+  z-index: 1000;
+  min-width: 200px;
+  opacity: 0.95;
+}
+
+.color-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.color-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: right;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.95em;
+}
+
+.color-option:hover {
+  background-color: color-mix(in srgb, var(--theme-text) 10%, transparent);
+}
+
+.color-option.active {
+  background-color: color-mix(in srgb, var(--theme-text) 15%, transparent);
+  border-color: var(--theme-text);
+}
+
+.color-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: block;
+}
+
+.color-label {
+  flex: 1;
+}
+
 .favorites-link {
-  color: #000;
+  color: var(--theme-text);
   text-decoration: none;
   font-size: 0.95em;
   padding: 6px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--theme-text);
   border-radius: 4px;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
   white-space: nowrap;
-  margin-top: 8px;
+  opacity: 0.7;
 }
 .favorites-link:hover {
-  background-color: #f5f5f5;
-  border-color: #999;
+  opacity: 1;
+  background-color: color-mix(in srgb, var(--theme-text) 10%, transparent);
 }
 
 /* --- Main / breadcrumb --- */
 main { min-height: 60vh; }
-.breadcrumb { margin-bottom: 30px; font-size: 0.95em; color: #555; }
-.breadcrumb a { color: #000; text-decoration: none; }
-.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb { margin-bottom: 30px; font-size: 0.95em; color: var(--theme-text); opacity: 0.7; }
+.breadcrumb a { color: var(--theme-text); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; opacity: 1; }
 .breadcrumb span { margin: 0 8px; }
 
 /* --- Index page styles --- */
 .book { margin-bottom: 50px; }
-.book h2 { font-size: 1.8em; margin-bottom: 8px; }
-.book .poet { color: #333; margin-bottom: 20px; font-size: 0.95em; }
+.book h2 { font-size: 1.8em; margin-bottom: 8px; color: var(--theme-text); }
+.book .poet { color: var(--theme-text); opacity: 0.7; margin-bottom: 20px; font-size: 0.95em; }
 .section { margin-bottom: 15px; }
 .poem-list { list-style: none; margin: 0; padding: 0; }
 .poem-list li { margin-bottom: 8px; }
 .poem-list a {
-  color: #000;
+  color: var(--theme-text);
   text-decoration: none;
   display: inline-block;
   padding: 4px 8px;
@@ -71,12 +164,12 @@ main { min-height: 60vh; }
   cursor: pointer;
 }
 .poem-list a:hover {
-  background-color: #f0f0f0;
+  background-color: color-mix(in srgb, var(--theme-text) 10%, transparent);
 }
 
 /* --- Poem --- */
 .poem { margin-top: 40px; }
-.poem h2 { font-size: 2em; margin-bottom: 35px; }
+.poem h2 { font-size: 2em; margin-bottom: 35px; color: var(--theme-text); }
 
 .couplets { 
   max-width: 800px; 
@@ -158,6 +251,11 @@ main { min-height: 60vh; }
   fill: #777;
 }
 
+/* Hide favorite buttons during selection mode */
+body.selecting-mode .favorite-btn {
+  display: none;
+}
+
 /* Each verse uses natural flow (no fixed widths), justified text like original */
 .verse {
   font-size: 1.3em;
@@ -175,9 +273,9 @@ main { min-height: 60vh; }
 /* --- Controls (buttons) --- */
 .screenshot-controls { display: flex; gap: 10px; margin-bottom: 25px; }
 .screenshot-controls button {
-  background: #fff;
-  border: 1.5px solid #000;
-  color: #000;
+  background: var(--theme-bg);
+  border: 1.5px solid var(--theme-text);
+  color: var(--theme-text);
   padding: 10px 18px;
   font-family: inherit;
   font-size: 0.95em;
@@ -189,14 +287,14 @@ main { min-height: 60vh; }
 
 /* Floating done button */
 #finish-selection {
-  background: #000;
-  color: #fff;
+  background: var(--theme-text);
+  color: var(--theme-bg);
   position: fixed;
   bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 999;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-text) 30%, transparent);
 }
 
 /* --- Selection visuals (only on page, not in screenshot) --- */
@@ -219,10 +317,10 @@ main { min-height: 60vh; }
 /* --- Hint text --- */
 .selection-hint {
   text-align: center;
-  color: #555;
+  color: var(--theme-text);
   font-size: 0.95em;
   margin-bottom: 20px;
-  background: #f7f7f7;
+  background: color-mix(in srgb, var(--theme-text) 5%, transparent);
   padding: 8px 15px;
   border-radius: 6px;
   display: inline-block;
@@ -335,9 +433,14 @@ main { min-height: 60vh; }
     flex-direction: column;
     align-items: flex-start;
   }
-  .favorites-link {
-    margin-top: 0;
-    align-self: flex-end;
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .color-picker {
+    left: auto;
+    right: 0;
   }
 }
 
@@ -350,15 +453,17 @@ main h2 {
   margin-top: 30px;
 }
 .favorite-card {
-  border: 1px solid #ddd;
+  border: 1px solid var(--theme-text);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-  background: #fff;
+  background: var(--theme-bg);
   transition: box-shadow 0.2s ease;
+  opacity: 0.8;
 }
 .favorite-card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-text) 15%, transparent);
+  opacity: 1;
 }
 .favorite-couplet {
   display: flex;
@@ -382,7 +487,8 @@ main h2 {
 }
 .favorite-meta {
   font-size: 0.9em;
-  color: #666;
+  color: var(--theme-text);
+  opacity: 0.7;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -392,21 +498,22 @@ main h2 {
   font-weight: 500;
 }
 .favorite-meta .separator {
-  color: #999;
+  opacity: 0.5;
 }
 .favorite-link {
-  color: #000;
+  color: var(--theme-text);
   text-decoration: none;
   font-size: 0.9em;
   display: inline-block;
   padding: 6px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--theme-text);
   border-radius: 4px;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  opacity: 0.7;
 }
 .favorite-link:hover {
-  background-color: #f5f5f5;
-  border-color: #999;
+  opacity: 1;
+  background-color: color-mix(in srgb, var(--theme-text) 10%, transparent);
 }
 
 @media (max-width: 600px) {
