@@ -7,26 +7,7 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <div>
-        <h1>حیران</h1>
-        <p class="subtitle">مجموعه اشعار پارسی</p>
-      </div>
-      <div class="header-actions">
-        <button class="theme-toggle" id="theme-toggle" aria-label="تغییر رنگ پس‌زمینه">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/>
-            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
-          </svg>
-        </button>
-        <div class="color-picker" id="color-picker" style="display: none;">
-          <div class="color-options" id="color-options"></div>
-        </div>
-        <a href="/favorites" class="favorites-link">علاقه‌مندی‌ها</a>
-      </div>
-    </div>
-  </header>
+  <%- include('partials/header', { showHomeLink: false }) %>
 
   <main>
     <% data.poets.forEach(poet => { %>
@@ -34,10 +15,9 @@
         <section class="book">
           <h2><%= book.title %></h2>
           <p class="poet">از <%= poet.name %></p>
-          
+
           <% book.sections.forEach(section => { %>
             <div class="section">
-              <!-- <h3><%= section.title %></h3> -->
               <ul class="poem-list">
                 <% section.poems.forEach(poem => { %>
                   <li>
@@ -54,11 +34,9 @@
     <% }); %>
   </main>
 
-  <footer>
-    <p>حیران - نمایش ساده اشعار پارسی</p>
-  </footer>
+  <%- include('partials/footer') %>
 
-  <script src="/theme.js"></script>
-  <script src="/color-picker.js"></script>
+  <script src="/client.js"></script>
 </body>
 </html>
+

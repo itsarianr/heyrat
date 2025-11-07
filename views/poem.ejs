@@ -7,26 +7,7 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <div>
-        <h1><a href="/">حیران</a></h1>
-        <p class="subtitle">مجموعه اشعار پارسی</p>
-      </div>
-      <div class="header-actions">
-        <button class="theme-toggle" id="theme-toggle" aria-label="تغییر رنگ پس‌زمینه">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/>
-            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
-          </svg>
-        </button>
-        <div class="color-picker" id="color-picker" style="display: none;">
-          <div class="color-options" id="color-options"></div>
-        </div>
-        <a href="/favorites" class="favorites-link">علاقه‌مندی‌ها</a>
-      </div>
-    </div>
-  </header>
+  <%- include('partials/header') %>
 
   <main>
     <nav class="breadcrumb">
@@ -54,7 +35,7 @@
           <div class="couplet" data-couplet-id="<%= poet.id %>-<%= book.id %>-<%= section.id %>-<%= poem.id %>-<%= index %>">
             <button class="favorite-btn" data-couplet-id="<%= poet.id %>-<%= book.id %>-<%= section.id %>-<%= poem.id %>-<%= index %>" aria-label="افزودن به علاقه‌مندی‌ها">
               <svg class="star-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path fill="none" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                <path fill="none" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
               </svg>
             </button>
             <p class="verse verse-first"><%= couplet[0] %></p>
@@ -65,12 +46,9 @@
     </article>
   </main>
 
-  <footer>
-    <p>حیران - نمایش ساده اشعار پارسی</p>
-  </footer>
+  <%- include('partials/footer') %>
 
   <script>
-    // Pass poem data to client-side
     window.POEM_DATA = {
       poetId: '<%= poet.id %>',
       poetName: '<%= poet.name %>',
@@ -81,9 +59,7 @@
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="/theme.js"></script>
-  <script src="/favorites.js"></script>
   <script src="/client.js"></script>
-  <script src="/color-picker.js"></script>
 </body>
 </html>
+
