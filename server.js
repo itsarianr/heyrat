@@ -50,8 +50,25 @@ app.get('/favorites', (req, res) => {
   res.render('favorites');
 });
 
-app.get('/:poetId/:bookId/:sectionId/:poemId', (req, res) => {
-  const { poetId, bookId, sectionId, poemId } = req.params;
+app.get('/:poetId/:bookId', (req, res) => {
+  const { poetId, bookId } = req.params;
+  const data = loadPoems();
+
+  const poet = data.poets.find(p => p.id === poetId);
+  if (!poet) {
+    return res.status(404).send('شاعر یافت نشد');
+  }
+
+  const book = poet.books.find(b => b.id === bookId);
+  if (!book) {
+    return res.status(404).send('کتاب یافت نشد');
+  }
+
+  res.render('book', { poet, book });
+});
+
+app.get('/:poetId/:bookId/:sectionId', (req, res) => {
+  const { poetId, bookId, sectionId } = req.params;
   const data = loadPoems();
   
   const poet = data.poets.find(p => p.id === poetId);
@@ -69,12 +86,7 @@ app.get('/:poetId/:bookId/:sectionId/:poemId', (req, res) => {
     return res.status(404).send('بخش یافت نشد');
   }
   
-  const poem = section.poems.find(p => p.id === poemId);
-  if (!poem) {
-    return res.status(404).send('شعر یافت نشد');
-  }
-  
-  res.render('poem', { poet, book, section, poem });
+  res.render('poem', { poet, book, section });
 });
 
 app.listen(PORT, '0.0.0.0', () => {

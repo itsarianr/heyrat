@@ -147,24 +147,79 @@ main { min-height: 60vh; }
 .breadcrumb span { margin: 0 8px; }
 
 /* --- Index page styles --- */
-.book { margin-bottom: 50px; }
-.book h2 { font-size: 1.8em; margin-bottom: 8px; color: var(--theme-text); }
-.book .poet { color: var(--theme-text); opacity: 0.7; margin-bottom: 20px; font-size: 0.95em; }
-.section { margin-bottom: 15px; }
-.poem-list { list-style: none; margin: 0; padding: 0; }
-.poem-list li { margin-bottom: 8px; }
-.poem-list a {
+.poet-section {
+  margin-bottom: 50px;
+}
+.poet-name {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  color: var(--theme-text);
+}
+.book-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.book-card {
+  display: block;
+  padding: 18px 22px;
+  border: 1px solid color-mix(in srgb, var(--theme-text) 20%, transparent);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--theme-text);
+  min-width: 220px;
+  flex: 1 1 220px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--theme-text) 15%, transparent);
+  border-color: var(--theme-text);
+}
+.book-card__title {
+  font-size: 1.15em;
+  margin-bottom: 8px;
+}
+.book-card__meta {
+  font-size: 0.85em;
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* --- Book (sections) page --- */
+.book {
+  margin-bottom: 40px;
+}
+.book h2 {
+  font-size: 1.8em;
+  margin-bottom: 12px;
+  color: var(--theme-text);
+}
+.book .poet {
+  color: var(--theme-text);
+  opacity: 0.7;
+  margin-bottom: 24px;
+  font-size: 0.95em;
+}
+.section-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.section-item a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 6px;
   color: var(--theme-text);
   text-decoration: none;
-  display: inline-block;
-  padding: 4px 8px;
-  margin-right: -8px;
-  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--theme-text) 6%, transparent);
   transition: background-color 0.15s ease;
-  cursor: pointer;
 }
-.poem-list a:hover {
-  background-color: color-mix(in srgb, var(--theme-text) 10%, transparent);
+.section-item a:hover {
+  background-color: color-mix(in srgb, var(--theme-text) 12%, transparent);
 }
 
 /* --- Poem --- */
@@ -464,6 +519,11 @@ main h2 {
 .favorite-card:hover {
   box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-text) 15%, transparent);
   opacity: 1;
+}
+.favorite-title {
+  font-size: 1.3em;
+  margin-bottom: 12px;
+  color: var(--theme-text);
 }
 .favorite-couplet {
   display: flex;

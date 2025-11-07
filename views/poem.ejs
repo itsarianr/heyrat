@@ -16,6 +16,8 @@
       <span><%= poet.name %></span>
       <span>←</span>
       <span><%= book.title %></span>
+      <span>←</span>
+      <span><%= section.title %></span>
     </nav>
 
     <article class="poem">
@@ -31,9 +33,9 @@
       </p>
 
       <div class="couplets">
-        <% poem.couplets.forEach((couplet, index) => { %>
-          <div class="couplet" data-couplet-id="<%= poet.id %>-<%= book.id %>-<%= section.id %>-<%= poem.id %>-<%= index %>">
-            <button class="favorite-btn" data-couplet-id="<%= poet.id %>-<%= book.id %>-<%= section.id %>-<%= poem.id %>-<%= index %>" aria-label="افزودن به علاقه‌مندی‌ها">
+        <% section.couplets.forEach((couplet, index) => { %>
+          <div class="couplet" data-couplet-id="<%= poet.id %>-<%= book.id %>-<%= section.id %>-<%= index %>">
+            <button class="favorite-btn" data-couplet-id="<%= poet.id %>-<%= book.id %>-<%= section.id %>-<%= index %>" aria-label="افزودن به علاقه‌مندی‌ها">
               <svg class="star-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path fill="none" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
               </svg>
@@ -49,14 +51,14 @@
   <%- include('partials/footer') %>
 
   <script>
-    window.POEM_DATA = {
-      poetId: '<%= poet.id %>',
-      poetName: '<%= poet.name %>',
-      bookId: '<%= book.id %>',
-      bookTitle: '<%= book.title %>',
-      sectionId: '<%= section.id %>',
-      poemId: '<%= poem.id %>'
-    };
+    window.POEM_DATA = <%- JSON.stringify({
+      poetId: poet.id,
+      poetName: poet.name,
+      bookId: book.id,
+      bookTitle: book.title,
+      sectionId: section.id,
+      sectionTitle: section.title
+    }) %>;
   </script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="/client.js"></script>

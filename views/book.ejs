@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= book.title %> - <%= poet.name %></title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="/">خانه</a>
+      <span>←</span>
+      <span><%= poet.name %></span>
+      <span>←</span>
+      <span><%= book.title %></span>
+    </nav>
+
+    <section class="book">
+      <h2><%= book.title %></h2>
+      <p class="poet">از <%= poet.name %></p>
+
+      <ul class="section-list">
+        <% book.sections.forEach(section => { %>
+          <li class="section-item">
+            <a href="/<%= poet.id %>/<%= book.id %>/<%= section.id %>">
+              <span><%= section.title %></span>
+            </a>
+          </li>
+        <% }); %>
+      </ul>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <script src="/client.js"></script>
+</body>
+</html>
+

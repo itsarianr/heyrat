@@ -9,8 +9,7 @@
     { label: 'روشن', background: '#ffffff', text: '#000000' },
     { label: 'تاریک', background: '#121212', text: '#e6e6e6' },
     { label: 'کاغذی', background: '#f7f3e9', text: '#2b2118' },
-    { label: 'بژ', background: '#faf4e6', text: '#4a2f16' },
-    { label: 'زیتونی', background: '#f2f4f1', text: '#3a3a2a' }
+    { label: 'زیتونی', background: '#eff7eb', text: '#3a3a2a' }
   ];
 
   const THEME_KEY = 'heyrat_theme';
@@ -109,7 +108,33 @@
 
   function getFavorites() {
     const stored = localStorage.getItem(FAVORITES_KEY);
-    return stored ? JSON.parse(stored) : {};
+    if (!stored) return {};
+
+    let parsed;
+    try {
+      parsed = JSON.parse(stored) || {};
+    } catch (err) {
+      return {};
+    }
+
+    let mutated = false;
+    Object.values(parsed).forEach(entry => {
+      if (entry && !entry.sectionId && entry.poemId) {
+        entry.sectionId = entry.poemId;
+        if (!entry.sectionTitle && entry.poemTitle) {
+          entry.sectionTitle = entry.poemTitle;
+        }
+        delete entry.poemId;
+        delete entry.poemTitle;
+        mutated = true;
+      }
+    });
+
+    if (mutated) {
+      saveFavorites(parsed);
+    }
+
+    return parsed;
   }
 
   function saveFavorites(favorites) {
@@ -171,7 +196,7 @@
         bookId: poemData.bookId,
         bookTitle: poemData.bookTitle,
         sectionId: poemData.sectionId,
-        poemId: poemData.poemId,
+        sectionTitle: poemData.sectionTitle,
         coupletIndex: parseInt(coupletId.split('-').pop(), 10),
         verses: coupletText
       };
