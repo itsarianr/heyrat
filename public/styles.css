@@ -592,6 +592,7 @@ main h2 {
   justify-content: space-between;
   gap: 10px;
   margin-top: 40px;
+  margin-bottom: 30px;
 }
 .poem-nav__link {
   flex: 1;
