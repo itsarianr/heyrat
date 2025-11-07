@@ -17,7 +17,7 @@
           <% poet.books.forEach(book => { %>
             <a class="book-card" href="/<%= poet.id %>/<%= book.id %>">
               <h3 class="book-card__title"><%= book.title %></h3>
-              <p class="book-card__meta"><%= book.sections.length %> بخش</p>
+              <p class="book-card__meta"><%= book.sections.length.toLocaleString('fa-IR') %> بخش</p>
             </a>
           <% }); %>
         </div>

@@ -10,6 +10,11 @@
   <%- include('partials/header') %>
 
   <main>
+    <% const sections = book.sections || []; %>
+    <% const currentIndex = sections.findIndex(s => s.id === section.id); %>
+    <% const prevSection = currentIndex > 0 ? sections[currentIndex - 1] : null; %>
+    <% const nextSection = currentIndex >= 0 && currentIndex < sections.length - 1 ? sections[currentIndex + 1] : null; %>
+
     <nav class="breadcrumb">
       <a href="/">خانه</a>
       <span>←</span>
@@ -46,6 +51,21 @@
         <% }); %>
       </div>
     </article>
+
+    <nav class="poem-nav">
+      <% if (prevSection) { %>
+        <a class="poem-nav__link" href="/<%= poet.id %>/<%= book.id %>/<%= prevSection.id %>">
+          <span class="poem-nav__primary">بخش قبل</span>
+          <span class="poem-nav__secondary"><%= prevSection.title %></span>
+        </a>
+      <% } %>
+      <% if (nextSection) { %>
+        <a class="poem-nav__link poem-nav__link--next" href="/<%= poet.id %>/<%= book.id %>/<%= nextSection.id %>">
+          <span class="poem-nav__primary">بخش بعد</span>
+          <span class="poem-nav__secondary"><%= nextSection.title %></span>
+        </a>
+      <% } %>
+    </nav>
   </main>
 
   <%- include('partials/footer') %>
