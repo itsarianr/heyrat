@@ -249,7 +249,7 @@
       link.click();
     }
 
-    async function shareCanvas(canvas, filename, text) {
+    async function shareCanvas(canvas, filename) {
       if (!navigator.share) {
         await downloadCanvas(canvas, filename);
         return;
@@ -265,23 +265,33 @@
 
           const file = new File([blob], filename, { type: 'image/png' });
           const shareData = { files: [file] };
-          if (text) {
-            shareData.text = text;
-          }
 
-          if (navigator.canShare && !navigator.canShare(shareData)) {
-            await downloadCanvas(canvas, filename);
-            resolve();
-            return;
-          }
+          let usedShare = false;
 
           try {
-            await navigator.share(shareData);
-            resolve();
+            if (!navigator.canShare || navigator.canShare(shareData)) {
+              await navigator.share(shareData);
+              usedShare = true;
+            }
           } catch (err) {
-            await downloadCanvas(canvas, filename);
-            resolve();
+            // continue to fallback attempts
           }
+
+          if (!usedShare) {
+            try {
+              const dataUrl = canvas.toDataURL('image/png');
+              await navigator.share({ url: dataUrl });
+              usedShare = true;
+            } catch (err) {
+              // ignore and fallback to download
+            }
+          }
+
+          if (!usedShare) {
+            await downloadCanvas(canvas, filename);
+          }
+
+          resolve();
         }, 'image/png');
       });
     }
@@ -306,6 +316,8 @@
       container.className = 'screenshot-container';
       container.style.backgroundColor = theme.background;
       container.style.color = theme.text;
+      container.style.setProperty('--theme-bg', theme.background);
+      container.style.setProperty('--theme-text', theme.text);
 
       selected.forEach(orig => {
         const clone = orig.cloneNode(true);
@@ -314,6 +326,14 @@
           el.classList.remove('selectable', 'selected');
         });
         clone.querySelectorAll('.favorite-btn').forEach(btn => btn.remove());
+
+        clone.style.color = theme.text;
+        clone.querySelectorAll('*').forEach(el => {
+          if (!el.style.color) {
+            el.style.color = theme.text;
+          }
+        });
+
         container.appendChild(clone);
       });
 
@@ -330,11 +350,10 @@
       try {
         const canvas = await html2canvas(container, { scale: 2, backgroundColor: theme.background });
         const filename = 'poem.png';
-        const shareText = poetName ? `گزیده‌ای از اشعار ${poetName}` : '';
         const shouldShare = navigator.share && window.innerWidth <= 768;
 
         if (shouldShare) {
-          await shareCanvas(canvas, filename, shareText);
+          await shareCanvas(canvas, filename);
         } else {
           await downloadCanvas(canvas, filename);
         }
