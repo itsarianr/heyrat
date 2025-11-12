@@ -2,3 +2,14 @@
   <p>حیران - نمایش سادهٔ اشعار پارسی</p>
 </footer>
 
+<script>
+  window.AUTH = Object.assign(
+    { isAuthenticated: false, hasDisplayName: false },
+    window.AUTH || {},
+    {
+      isAuthenticated: <%= currentUser ? 'true' : 'false' %>,
+      hasDisplayName: <%= currentUser && currentUser.display_name ? 'true' : 'false' %>
+    }
+  );
+</script>
+

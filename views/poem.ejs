@@ -29,17 +29,25 @@
       <h2><%= section.title %></h2>
 
       <div class="screenshot-controls">
-        <button id="start-selection">ساخت تصویر شعر</button>
+        <button id="start-post" class="post-launch-btn">
+          <span class="post-launch-btn__icon" aria-hidden="true">&#9998;</span>
+          <span class="post-launch-btn__label">ایجاد نوشته</span>
+        </button>
+        <button id="start-selection">ساخت تصویر از شعر</button>
         <button id="finish-selection" style="display:none;">پایان انتخاب</button>
       </div>
 
       <p id="selection-hint" class="selection-hint" style="display:none;">
-        ابیاتی که می‌خواهید را انتخاب کنید
+        ابیات مورد نظر را انتخاب و سپس «پایان انتخاب» را بزنید.
       </p>
 
       <div class="couplets">
         <% section.couplets.forEach((couplet, index) => { %>
-          <div class="couplet" data-couplet-id="<%= poet.id %>-<%= book.id %>-<%= section.id %>-<%= index %>">
+          <div
+            class="couplet"
+            data-couplet-id="<%= poet.id %>-<%= book.id %>-<%= section.id %>-<%= index %>"
+            data-couplet-index="<%= index %>"
+          >
             <button class="favorite-btn" data-couplet-id="<%= poet.id %>-<%= book.id %>-<%= section.id %>-<%= index %>" aria-label="افزودن به علاقه‌مندی‌ها">
               <svg class="star-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path fill="none" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
@@ -66,19 +74,58 @@
         </a>
       <% } %>
     </nav>
+    <section id="post-sheet" class="post-sheet" aria-hidden="true">
+      <div class="post-sheet__backdrop" data-sheet-close></div>
+      <div class="post-sheet__panel" role="dialog" aria-modal="true" aria-labelledby="post-sheet-title">
+        <header class="post-sheet__header">
+          <h3 id="post-sheet-title">نوشتن درباره ابیات انتخاب‌شده</h3>
+          <button type="button" class="post-sheet__close" data-sheet-close aria-label="بستن">&times;</button>
+        </header>
+
+        <div class="post-sheet__body">
+          <div class="post-sheet__couplets" id="post-sheet-couplets"></div>
+          <p class="post-sheet__error" id="post-sheet-error" hidden></p>
+
+          <label class="post-sheet__label" for="post-textarea">
+            متن نوشته
+            <span class="post-sheet__char-count" id="post-char-count">۰ / ۲۸۰</span>
+          </label>
+          <textarea
+            id="post-textarea"
+            class="post-sheet__textarea"
+            maxlength="280"
+            rows="5"
+            placeholder="اینجا می‌توانید درباره این ابیات بنویسید..."
+          ></textarea>
+        </div>
+
+        <footer class="post-sheet__footer">
+          <button type="button" class="btn btn--ghost" data-sheet-close>انصراف</button>
+          <button type="button" class="btn btn--primary" id="post-submit-btn">انتشار نوشته</button>
+        </footer>
+      </div>
+    </section>
   </main>
 
   <%- include('partials/footer') %>
 
+  <div id="toast-stack" class="toast-stack"></div>
+
+  <script id="poem-data" type="application/json"><%- JSON.stringify({
+    poetId: poet.id,
+    poetName: poet.name,
+    bookId: book.id,
+    bookTitle: book.title,
+    sectionId: section.id,
+    sectionTitle: section.title
+  }) %></script>
   <script>
-    window.POEM_DATA = <%- JSON.stringify({
-      poetId: poet.id,
-      poetName: poet.name,
-      bookId: book.id,
-      bookTitle: book.title,
-      sectionId: section.id,
-      sectionTitle: section.title
-    }) %>;
+    try {
+      const poemDataEl = document.getElementById('poem-data');
+      window.POEM_DATA = poemDataEl ? JSON.parse(poemDataEl.textContent) : null;
+    } catch (err) {
+      window.POEM_DATA = null;
+    }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="/client.js"></script>

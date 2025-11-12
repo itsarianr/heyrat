@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فید نوشته‌ها - حیران</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <main class="feed-page">
+    <header class="feed-page__intro">
+      <h2 class="feed-page__title">نوشته‌های کاربران حیران</h2>
+      <p class="feed-page__subtitle">
+        آخرین تجربه‌ها و برداشت‌های خوانندگان از ابیات انتخاب‌شده را مرور کنید.
+      </p>
+    </header>
+
+    <section id="feed" class="feed-list">
+      <% if (!posts || posts.length === 0) { %>
+        <p class="feed-list__empty">
+          هنوز نوشته‌ای ثبت نشده است. نخستین نفری باشید که درباره ابیات محبوبتان می‌نویسید.
+        </p>
+      <% } else { %>
+        <% posts.forEach(post => { %>
+          <article class="feed-post" data-post-id="<%= post.id %>">
+            <header class="feed-post__header">
+              <div>
+                <h3 class="feed-post__author"><%= post.display_name || post.email %></h3>
+                <div class="feed-post__meta">
+                  <span class="feed-post__meta-item"><%= post.poet_name %></span>
+                  <span class="feed-post__meta-separator">·</span>
+                  <span class="feed-post__meta-item"><%= post.book_title %></span>
+                  <span class="feed-post__meta-separator">·</span>
+                  <span class="feed-post__meta-item"><%= post.section_title %></span>
+                </div>
+              </div>
+              <time class="feed-post__date" datetime="<%= post.created_at %>">
+                <%= post.createdAtFormatted %>
+              </time>
+            </header>
+
+            <div class="feed-post__couplets">
+              <% post.couplets.forEach(couplet => { %>
+                <div class="feed-post__couplet">
+                  <p class="feed-post__verse feed-post__verse--first"><%= couplet.verse_first %></p>
+                  <% if (couplet.verse_second) { %>
+                    <p class="feed-post__verse feed-post__verse--second"><%= couplet.verse_second %></p>
+                  <% } %>
+                </div>
+              <% }); %>
+            </div>
+
+            <% if (post.body) { %>
+              <p class="feed-post__body"><%= post.body %></p>
+            <% } %>
+
+            <footer class="feed-post__footer">
+              <button
+                type="button"
+                class="feed-post__like-button <%= post.is_liked ? 'feed-post__like-button--active' : '' %>"
+                data-like-button
+                data-post-id="<%= post.id %>"
+                aria-pressed="<%= post.is_liked ? 'true' : 'false' %>"
+                aria-label="<%= post.is_liked ? 'لغو پسند' : 'پسند' %>"
+              >
+                <span class="feed-post__like-icon" aria-hidden="true">♥</span>
+                <span class="feed-post__like-count" data-like-count>
+                  <%= Number(post.like_count || 0).toLocaleString('fa-IR') %>
+                </span>
+              </button>
+            </footer>
+          </article>
+        <% }); %>
+      <% } %>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <script src="/client.js"></script>
+</body>
+</html>
+

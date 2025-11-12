@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورود به حیران</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <%- include('../partials/header') %>
+
+  <main class="auth-page">
+    <section class="auth-card">
+      <h2 class="auth-card__title">ساخت حساب کاربری</h2>
+      <p class="auth-card__subtitle">
+        برای اشتراک‌گذاری نوشته‌های خود درباره ابیات، ایمیل‌تان را وارد کنید. فعلاً نیازی به تأیید ایمیل نیست.
+      </p>
+
+      <% if (errors && errors.length > 0) { %>
+        <ul class="auth-card__errors">
+          <% errors.forEach(error => { %>
+            <li><%= error %></li>
+          <% }); %>
+        </ul>
+      <% } %>
+
+      <form class="auth-form" action="/auth/login" method="POST" novalidate>
+        <label class="auth-form__label" for="loginEmailInput">ایمیل</label>
+        <input
+          id="loginEmailInput"
+          name="email"
+          type="email"
+          class="auth-form__input"
+          value="<%= values && values.email ? values.email : '' %>"
+          required
+          autocomplete="email"
+          placeholder="example@email.com"
+        />
+        <button type="submit" class="btn btn--primary auth-form__submit">
+          ادامه
+        </button>
+      </form>
+
+      <% if (isGoogleConfigured) { %>
+        <p class="auth-card__note">
+          ورود با گوگل به‌زودی دوباره فعال می‌شود؛ تا آن زمان می‌توانید با ایمیل وارد شوید.
+        </p>
+      <% } %>
+    </section>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script src="/client.js"></script>
+</body>
+</html>
+
+

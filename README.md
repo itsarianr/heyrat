@@ -1,98 +1,104 @@
-# Heyrat (حیرت)
+# Heyrat (حیران)
 
-A minimal Persian poetry website built with Node.js, Express, and EJS.
+یک وب‌اپلیکیشن ساده برای مرور اشعار پارسی، اکنون با امکان ساخت نوشته‌های کاربری؛ در حال حاضر ورود با وارد کردن ایمیل انجام می‌شود (Google OAuth در کد باقی مانده است).
 
-## Description
+## امکانات
 
-Heyrat is a simple monolithic web application for displaying Persian poems (Farsi, right-to-left). Each poem belongs to a book and section, with all data stored in local JSON files.
+- رندر سمت سرور با Express 5 و EJS
+- ورود سریع با وارد کردن ایمیل (بدون تأیید)؛ Google OAuth همچنان در کد حفظ شده است
+- پایگاه داده‌ی SQLite برای کاربران، نوشته‌ها، ابیات انتخابی و پسندها
+- فید زمانی نوشته‌های کاربران همراه با دکمه‌ی «پسند» مشابه توییتر
+- انتخاب ابیات (همان منطق ساخت اسکرین‌شات) برای نوشتن و ثبت نوشته
+- ذخیره‌ی علاقه‌مندی‌ها در مرورگر و ژنراتور تصویر از ابیات
+- طراحی تماماً راست‌به‌چپ با چند پوسته‌ی رنگی قابل تغییر
 
-## Features
+## پیش‌نیازها
 
-- Server-side rendering with EJS templates
-- Fully RTL (right-to-left) design for Farsi text
-- Clean black-on-white minimalist interface
-- JSON-based data storage
-- No client-side JavaScript
-- Lightweight and portable
+- Node.js نسخه‌ی 16 یا بالاتر
+- npm (به‌صورت پیش‌فرض همراه Node.js)
+- (اختیاری) حساب Google Cloud برای وقتی که می‌خواهید ورود با گوگل را دوباره فعال کنید
 
-## Requirements
+## راه‌اندازی
 
-- Node.js (version 14 or higher)
-- npm (comes with Node.js)
+1. وابستگی‌ها را نصب کنید:
 
-## Installation
-
-### macOS
-
-1. Install Node.js from [nodejs.org](https://nodejs.org/) or via Homebrew:
-   ```bash
-   brew install node
-   ```
-
-2. Clone or download this project, then navigate to the project directory:
-   ```bash
-   cd heyrat
-   ```
-
-3. Install dependencies:
    ```bash
    npm install
    ```
 
-### Ubuntu
+2. متغیرهای محیطی موردنیاز را تنظیم کنید. ساده‌ترین حالت در توسعه این است که یک فایل `.env` کنار `server.js` بسازید:
 
-1. Install Node.js:
-   ```bash
-   sudo apt update
-   sudo apt install nodejs npm
+   ```
+   SESSION_SECRET=choose-a-strong-random-secret
+   PORT=5000
+   # مقادیر زیر اختیاری‌اند و فقط در صورت فعال‌سازی مجدد Google OAuth لازم می‌شوند
+   # GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+   # GOOGLE_CLIENT_SECRET=your-google-client-secret
+   # GOOGLE_CALLBACK_URL=http://localhost:5000/auth/google/callback
    ```
 
-2. Navigate to the project directory:
+   یا اگر ترجیح می‌دهید مستقیم در ترمینال ست کنید (macOS/Linux):
+
    ```bash
-   cd heyrat
+   export SESSION_SECRET="choose-a-strong-random-secret"
+   export PORT=5000
+   # برای فعال‌سازی مجدد Google OAuth:
+   # export GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
+   # export GOOGLE_CLIENT_SECRET="your-google-client-secret"
+   # export GOOGLE_CALLBACK_URL="http://localhost:5000/auth/google/callback"
    ```
 
-3. Install dependencies:
+   > اگر متغیرهای گوگل را تعیین نکنید، ورود همچنان با ایمیل ساده کار می‌کند. برای فعال‌سازی دوباره Google OAuth همین مقادیر را اضافه کنید.
+
+3. سرور را اجرا کنید:
+
    ```bash
-   npm install
+   npm start
    ```
 
-## Running the Application
+   برنامه به‌صورت پیش‌فرض روی `http://localhost:5000` در دسترس است (قابل تغییر با متغیر محیطی `PORT`).
 
-Start the server:
+4. برای توقف، در ترمینال `Ctrl+C` را بزنید.
 
-```bash
-npm start
-```
+### محیط توسعه در مقابل تولید
 
-The application will be available at:
-- `http://localhost:5000` (default)
-- Or on the port specified by the `PORT` environment variable
+- **توسعه (محلی):** فایل `.env` فقط روی سیستم خودتان بماند و در گیت رد شود (`.gitignore` از قبل آن را نادیده می‌گیرد). با هر بار اجرای `npm start`، مقدارها به‌طور خودکار بارگذاری می‌شوند.
+- **تولید:** معمولاً میزبان‌هایی مثل Render، Vercel یا سرور شخصی اجازه‌ی ثبت متغیرهای محیطی را می‌دهند. همان کلیدها را آنجا تعریف کنید و فایل `.env` را روی سرور نگذارید. اگر نیاز دارید از فایل استفاده کنید، آن را خارج از مخزن نگه دارید و هنگام دپلوی در همان مسیر قرار دهید.
 
-To stop the server, press `Ctrl+C` in the terminal.
+## پایگاه داده
 
-## Project Structure
+- در اولین اجرا فایل SQLite با مسیر `data/heyrat.sqlite` ساخته می‌شود (در صورت نبود، پوشه‌ی `data/` نیز ایجاد می‌گردد).
+- جداول موجود:
+  - `users`: شناسه‌ی گوگل، ایمیل و نام نمایشی کاربران
+  - `posts`: نوشته‌های کاربران، اطلاعات شاعر/کتاب/بخش و متن نوشته
+  - `post_couplets`: ابیات انتخاب شده‌ی هر نوشته
+  - `likes`: پسندهای کاربران روی هر نوشته
+- برای ریست کامل داده‌های کاربران و نوشته‌ها، کافی است فایل `data/heyrat.sqlite` را حذف کنید.
+
+## ساختار پروژه
 
 ```
 heyrat/
-├── server.js          # Express server configuration
-├── package.json       # Project dependencies and scripts
-├── README.md          # This file
-├── views/             # EJS templates
-│   ├── index.ejs      # Home page listing all poems
-│   └── poem.ejs       # Individual poem display page
-├── data/              # JSON data files organized by poet
-│   └── hafez/         # Poet folder (one per poet)
-│       └── divan.json # Book file (one per book)
-└── public/            # Static files
-    └── styles.css     # RTL-optimized CSS styling
+├── server.js          # تنظیمات مسیرها، فید، API پسنـد و پست
+├── auth.js            # پیکربندی Passport و Google OAuth
+├── db.js              # راه‌اندازی SQLite و کمک‌های کوئری
+├── public/
+│   ├── client.js      # منطق فرانت‌اند: انتخاب ابیات، نوشته، پسند، پوسته
+│   └── styles.css     # استایل RTL، شیت نوشتن، فید و دکمه‌ها
+├── views/
+│   ├── index.ejs      # صفحه‌ی اصلی + CTA فید
+│   ├── feed.ejs       # فید نوشته‌ها و دکمه‌ی پسند
+│   ├── poem.ejs       # صفحه‌ی شعر با انتخاب ابیات و حالت نوشته
+│   └── auth/          # صفحات ورود با گوگل و تنظیم نام نمایشی
+├── data/
+│   └── *.json         # داده‌ی آفلاین اشعار (برای فهرست و نمایش)
+├── package.json
+└── README.md          # این فایل
 ```
 
-## Adding More Content
+## افزودن محتوای شعری
 
-### Adding a New Book
-
-To add a new book by an existing poet, create a new JSON file in the poet's folder (e.g., `data/hafez/new-book.json`):
+ساختار فایل‌های JSON مانند قبل است و فقط برای دیتاست شعرها استفاده می‌شود. نمونه‌ی افزودن کتاب جدید:
 
 ```json
 {
@@ -121,22 +127,18 @@ To add a new book by an existing poet, create a new JSON file in the poet's fold
 }
 ```
 
-### Adding a New Poet
+- هر شاعر پوشه‌ی اختصاصی خود را در `data/` دارد.
+- هر بخش شامل شناسه‌ی یکتا و آرایه‌ای از ابیات است (آرایه‌ی دو عنصری برای هر بیت).
 
-1. Create a new folder in `data/` with the poet's ID (e.g., `data/rumi/`)
-2. Add book JSON files inside that folder following the structure above
-3. The server will automatically detect and load the new poet on restart
+## نکات ورود با گوگل
 
-### Data Structure Notes
+- در Google Cloud Console یک OAuth 2.0 Client (Web) بسازید.
+- آدرس‌های مجاز:
+  - Authorized redirect URI → `http://localhost:5000/auth/google/callback`
+  - Authorized JavaScript origin → `http://localhost:5000`
+- شناسه و کلید تولید شده را در متغیرهای محیطی بالا قرار دهید.
+- بعد از اولین ورود، کاربر باید نام نمایشی (Display Name) انتخاب کند؛ این نام در فید نمایش داده می‌شود و ایمیل مخفی می‌ماند.
 
-- Each couplet is an array with two verses: `["first verse", "second verse"]`
-- Couplets are displayed side by side on desktop (right-aligned and left-aligned)
-- On mobile, couplets stack vertically while maintaining the alignment
+## لایسنس
 
-## License
-
-This project is open source and available for educational purposes.
-
-## Contact
-
-For questions or contributions, please open an issue on the project repository.
+این پروژه برای استفاده‌ی آموزشی و شخصی در دسترس است. در صورت مشارکت، لطفاً Pull Request ثبت کنید.*** End Patch

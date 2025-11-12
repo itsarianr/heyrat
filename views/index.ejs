@@ -10,6 +10,16 @@
   <%- include('partials/header', { showHomeLink: false }) %>
 
   <main>
+    <section class="feed-cta">
+      <div class="feed-cta__text">
+        <h2 class="feed-cta__title">فید نوشته‌ها</h2>
+        <p class="feed-cta__subtitle">
+          نوشته‌های عاشقان شعر درباره ابیات محبوب‌شان را دنبال کنید.
+        </p>
+      </div>
+      <a class="btn btn--primary feed-cta__button" href="/feed">مشاهده فید</a>
+    </section>
+
     <% data.poets.forEach(poet => { %>
       <section class="poet-section">
         <h2 class="poet-name"><%= poet.name %></h2>
