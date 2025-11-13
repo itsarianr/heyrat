@@ -374,6 +374,9 @@ app.get('/feed', async (req, res, next) => {
           posts.id,
           posts.body,
           posts.created_at,
+          posts.poet_id,
+          posts.book_id,
+          posts.section_id,
           posts.poet_name,
           posts.book_title,
           posts.section_title,
@@ -428,17 +431,57 @@ app.get('/feed', async (req, res, next) => {
       });
     }
 
-    const dateFormatter = new Intl.DateTimeFormat('fa-IR', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    });
+    function toPersianDigits(num) {
+      const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
+    }
+
+    function formatRelativeTime(date) {
+      const now = new Date();
+      let postDate;
+      
+      // Handle SQLite datetime string format (YYYY-MM-DD HH:MM:SS)
+      if (typeof date === 'string') {
+        // SQLite datetime format
+        postDate = new Date(date.replace(' ', 'T'));
+      } else {
+        postDate = new Date(date);
+      }
+      
+      // Check if date is valid
+      if (isNaN(postDate.getTime())) {
+        return 'تاریخ نامعتبر';
+      }
+      
+      const diffMs = now - postDate;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) {
+        return 'همین الان';
+      } else if (diffMins < 60) {
+        return `${toPersianDigits(diffMins)} دقیقه قبل`;
+      } else if (diffHours < 24) {
+        return `${toPersianDigits(diffHours)} ساعت قبل`;
+      } else if (diffDays === 1) {
+        return 'دیروز';
+      } else if (diffDays < 7) {
+        return `${toPersianDigits(diffDays)} روز قبل`;
+      } else {
+        const dateFormatter = new Intl.DateTimeFormat('fa-IR', {
+          dateStyle: 'medium'
+        });
+        return dateFormatter.format(postDate);
+      }
+    }
 
     const feedPosts = posts.map(post => ({
       ...post,
       like_count: Number(post.like_count) || 0,
       is_liked: Boolean(post.is_liked),
       couplets: coupletsByPost[post.id] || [],
-      createdAtFormatted: dateFormatter.format(new Date(post.created_at))
+      createdAtFormatted: formatRelativeTime(post.created_at)
     }));
 
     res.render('feed', { posts: feedPosts });

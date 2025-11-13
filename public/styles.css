@@ -301,6 +301,14 @@ main { min-height: 60vh; }
 .breadcrumb a { color: var(--theme-text); text-decoration: none; }
 .breadcrumb a:hover { text-decoration: underline; opacity: 1; }
 .breadcrumb span { margin: 0 8px; }
+.breadcrumb span:last-child {
+  display: inline-block;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
 
 /* --- Index page styles --- */
 .poet-section {
@@ -509,7 +517,6 @@ body.selecting-mode .favorite-btn {
 
 /* Each verse uses natural flow (no fixed widths), justified text like original */
 .verse {
-  font-size: 1.3em;
   line-height: 2.5;
   margin: 0;
   text-align: justify;          /* justify the lines */
@@ -746,6 +753,8 @@ body.post-sheet-open {
   transform: translateY(14px);
   transition: opacity 0.25s ease, transform 0.25s ease;
   pointer-events: auto;
+  max-width: 90vw;
+  min-width: 0;
 }
 .toast--visible {
   opacity: 0.97;
@@ -753,11 +762,15 @@ body.post-sheet-open {
 }
 .toast__message {
   font-size: 0.95em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .toast__action {
   color: inherit;
   font-weight: 600;
   text-decoration: underline;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .toast__action:hover {
   opacity: 0.85;
@@ -1076,68 +1089,117 @@ main h2 {
   opacity: 0.75;
 }
 .feed-post {
-  border: 1px solid color-mix(in srgb, var(--theme-text) 20%, transparent);
-  border-radius: 18px;
-  padding: 22px 24px;
-  background: color-mix(in srgb, var(--theme-bg) 92%, var(--theme-text) 8%);
-  box-shadow: 0 12px 24px color-mix(in srgb, var(--theme-text) 10%, transparent);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  border: 1px solid color-mix(in srgb, var(--theme-text) 15%, transparent);
+  border-radius: 16px;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.18s ease;
 }
 .feed-post:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 32px color-mix(in srgb, var(--theme-text) 14%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--theme-text) 12%, transparent);
 }
 .feed-post__header {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
   align-items: flex-start;
-}
-.feed-post__author {
-  margin: 0;
-  font-size: 1.1em;
-}
-.feed-post__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  font-size: 0.85em;
-  opacity: 0.7;
-}
-.feed-post__meta-separator {
-  opacity: 0.4;
+  margin-bottom: 12px;
+  position: relative;
+  flex-direction: row-reverse;
 }
 .feed-post__date {
   font-size: 0.85em;
   opacity: 0.6;
   white-space: nowrap;
+  color: #000000;
+}
+.feed-post__author-section {
+  direction: ltr;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-direction: row-reverse;
+}
+.feed-post__avatar {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  color: #666666;
+}
+.feed-post__author {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #000000;
+}
+.feed-post__body {
+  margin: 0 0 16px;
+  font-size: 0.95em;
+  line-height: 1.8;
+  white-space: pre-line;
+  color: var(--theme-text);
 }
 .feed-post__couplets {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 .feed-post__couplet {
-  border: 1px solid color-mix(in srgb, var(--theme-text) 18%, transparent);
+  border: 1px solid #e0e0e0;
   border-radius: 12px;
-  padding: 12px 14px;
-  background: color-mix(in srgb, var(--theme-bg) 96%, var(--theme-text) 4%);
+  padding: 14px 16px;
+  background: #f5f5f5;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
 }
 .feed-post__verse {
   margin: 0;
   font-size: 1.05em;
   line-height: 2.1;
+  color: #000000;
 }
-.feed-post__body {
-  margin: 0 0 16px;
-  font-size: 1em;
-  line-height: 2;
-  white-space: pre-line;
+.feed-post__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7em;
+  opacity: 0.7;
+  color: #000000;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+  cursor: pointer;
+  transition: opacity 0.18s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-decoration: none;
+  align-self: flex-end;
+}
+.feed-post__meta:hover {
+  opacity: 1;
+}
+.feed-post__meta-separator {
+  opacity: 0.5;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.feed-post__meta-item {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.feed-post__meta-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+  opacity: 0.6;
+  flex-shrink: 0;
+  color: currentColor;
 }
 .feed-post__footer {
   display: flex;
@@ -1147,40 +1209,46 @@ main h2 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--theme-text) 30%, transparent);
+  padding: 0;
+  border: none;
   background: transparent;
-  color: var(--theme-text);
+  color: #000000;
   font-family: inherit;
   cursor: pointer;
-  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  transition: opacity 0.18s ease;
 }
 .feed-post__like-button:hover {
-  background: color-mix(in srgb, var(--theme-text) 12%, transparent);
+  opacity: 0.7;
 }
 .feed-post__like-button--active {
-  background: color-mix(in srgb, var(--theme-text) 14%, transparent);
-  border-color: var(--theme-text);
+  opacity: 1;
 }
-.feed-post__like-icon {
-  font-size: 1.1em;
-  font-family: inherit;
+.feed-post__like-button--active .feed-post__like-icon {
+  color: #d53b3b;
 }
 .feed-post__like-count {
-  font-size: 0.9em;
-  opacity: 0.8;
+  font-size: 0.95em;
+  font-weight: 500;
+}
+.feed-post__like-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: #000000;
+  transition: color 0.18s ease, fill 0.18s ease;
+}
+.feed-post__like-button--active .feed-post__like-icon {
+  color: #d53b3b;
+  fill: #d53b3b;
 }
 
 @media (max-width: 680px) {
   .feed-post {
-    padding: 18px 20px;
+    padding: 16px;
   }
-  .feed-post__header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .feed-post__date {
-    align-self: flex-end;
-  }
+}
+
+/* --- Footer --- */
+footer {
+  margin-top: 20px;
 }

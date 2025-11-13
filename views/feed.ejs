@@ -26,20 +26,21 @@
         <% posts.forEach(post => { %>
           <article class="feed-post" data-post-id="<%= post.id %>">
             <header class="feed-post__header">
-              <div>
-                <h3 class="feed-post__author"><%= post.display_name || post.email %></h3>
-                <div class="feed-post__meta">
-                  <span class="feed-post__meta-item"><%= post.poet_name %></span>
-                  <span class="feed-post__meta-separator">·</span>
-                  <span class="feed-post__meta-item"><%= post.book_title %></span>
-                  <span class="feed-post__meta-separator">·</span>
-                  <span class="feed-post__meta-item"><%= post.section_title %></span>
-                </div>
-              </div>
               <time class="feed-post__date" datetime="<%= post.created_at %>">
                 <%= post.createdAtFormatted %>
               </time>
+              <div class="feed-post__author-section">
+                <svg class="feed-post__avatar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <h3 class="feed-post__author"><%= post.display_name || post.email %></h3>
+              </div>
             </header>
+
+            <% if (post.body) { %>
+              <p class="feed-post__body"><%= post.body %></p>
+            <% } %>
 
             <div class="feed-post__couplets">
               <% post.couplets.forEach(couplet => { %>
@@ -48,13 +49,19 @@
                   <% if (couplet.verse_second) { %>
                     <p class="feed-post__verse feed-post__verse--second"><%= couplet.verse_second %></p>
                   <% } %>
+                  <a href="/<%= post.poet_id || '' %>/<%= post.book_id || '' %>/<%= post.section_id || '' %>" class="feed-post__meta">
+                    <span class="feed-post__meta-item"><%= post.poet_name %></span>
+                    <span class="feed-post__meta-separator">-</span>
+                    <span class="feed-post__meta-item"><%= post.book_title %></span>
+                    <svg class="feed-post__meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </a>
                 </div>
               <% }); %>
             </div>
-
-            <% if (post.body) { %>
-              <p class="feed-post__body"><%= post.body %></p>
-            <% } %>
 
             <footer class="feed-post__footer">
               <button
@@ -65,7 +72,9 @@
                 aria-pressed="<%= post.is_liked ? 'true' : 'false' %>"
                 aria-label="<%= post.is_liked ? 'لغو پسند' : 'پسند' %>"
               >
-                <span class="feed-post__like-icon" aria-hidden="true">♥</span>
+                <svg class="feed-post__like-icon" viewBox="0 0 24 24" fill="<%= post.is_liked ? 'currentColor' : 'none' %>" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
                 <span class="feed-post__like-count" data-like-count>
                   <%= Number(post.like_count || 0).toLocaleString('fa-IR') %>
                 </span>

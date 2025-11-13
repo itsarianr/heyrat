@@ -792,6 +792,11 @@
         likeButton.setAttribute('aria-label', liked ? 'لغو پسند' : 'پسند');
         likeButton.classList.toggle('feed-post__like-button--active', liked);
 
+        const iconEl = likeButton.querySelector('.feed-post__like-icon');
+        if (iconEl) {
+          iconEl.setAttribute('fill', liked ? 'currentColor' : 'none');
+        }
+
         const countEl = likeButton.querySelector('[data-like-count]');
         if (countEl && likeCount !== null) {
           countEl.textContent = likeCount.toLocaleString('fa-IR');
