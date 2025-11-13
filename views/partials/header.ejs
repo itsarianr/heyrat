@@ -7,30 +7,30 @@
     })(window, document, "clarity", "script", "u2dut8w37e");
   </script>
 
+  <button class="theme-toggle" id="theme-toggle" aria-label="تغییر رنگ پس‌زمینه">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5" />
+      <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
+    </svg>
+  </button>
+
+  <div class="color-picker" id="color-picker" style="display: none;">
+    <div class="color-options" id="color-options"></div>
+  </div>
+
   <div class="header-content">
-    <div>
-      <% if (typeof showHomeLink === 'undefined' || showHomeLink) { %>
-        <h1><a href="/">حیران</a></h1>
-      <% } else { %>
-        <h1>حیران</h1>
-      <% } %>
+    <div class="header-title-section">
+      <h1><a href="/">حیران</a></h1>
       <p class="subtitle">مجموعه اشعار پارسی</p>
     </div>
+    <nav class="header-nav">
+      <a href="/" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/' ? 'header-nav__link--active' : '' %>">خانه</a>
+      <a href="/feed" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/feed' ? 'header-nav__link--active' : '' %>">فید</a>
+      <a href="/favorites" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/favorites' ? 'header-nav__link--active' : '' %>">علاقه‌مندی‌ها</a>
+      <a href="/profile/display-name" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath && currentPath.startsWith('/profile') ? 'header-nav__link--active' : '' %>">حساب</a>
+    </nav>
 
     <div class="header-actions">
-      <button class="theme-toggle" id="theme-toggle" aria-label="تغییر رنگ پس‌زمینه">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5" />
-          <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
-        </svg>
-      </button>
-
-      <div class="color-picker" id="color-picker" style="display: none;">
-        <div class="color-options" id="color-options"></div>
-      </div>
-
-      <a href="/favorites" class="favorites-link">علاقه‌مندی‌ها</a>
-
       <% if (currentUser) { %>
         <div class="header-user">
           <span class="header-user__name"><%= currentUser.display_name || currentUser.email %></span>
@@ -38,8 +38,6 @@
             <button type="submit" class="btn btn--ghost">خروج</button>
           </form>
         </div>
-      <% } else { %>
-        <a href="/auth/login" class="btn btn--primary header-auth-link">ساخت حساب</a>
       <% } %>
     </div>
   </div>

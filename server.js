@@ -95,7 +95,7 @@ function getSectionData(poetId, bookId, sectionId) {
 
 app.get('/', (req, res) => {
   const data = loadPoems();
-  res.render('index', { data });
+  res.render('index', { data, currentPath: '/' });
 });
 
 app.get('/auth/login', (req, res) => {
@@ -194,7 +194,8 @@ app.get('/profile/display-name', ensureAuthenticated, (req, res) => {
   res.render('auth/display-name', {
     errors: [],
     values: { displayName: '' },
-    hasDisplayName: Boolean(req.user.display_name)
+    hasDisplayName: Boolean(req.user.display_name),
+    currentPath: '/profile/display-name'
   });
 });
 
@@ -223,7 +224,8 @@ app.post('/profile/display-name', ensureAuthenticated, async (req, res, next) =>
       res.status(422).render('auth/display-name', {
         errors,
         values: { displayName },
-        hasDisplayName: Boolean(req.user.display_name)
+        hasDisplayName: Boolean(req.user.display_name),
+        currentPath: '/profile/display-name'
       });
       return;
     }
@@ -484,7 +486,7 @@ app.get('/feed', async (req, res, next) => {
       createdAtFormatted: formatRelativeTime(post.created_at)
     }));
 
-    res.render('feed', { posts: feedPosts });
+    res.render('feed', { posts: feedPosts, currentPath: '/feed' });
   } catch (err) {
     next(err);
   }
@@ -548,7 +550,7 @@ app.delete('/api/posts/:postId/likes', ensureAuthenticated, async (req, res, nex
 });
 
 app.get('/favorites', (req, res) => {
-  res.render('favorites');
+  res.render('favorites', { currentPath: '/favorites' });
 });
 
 app.get('/:poetId/:bookId', (req, res) => {
