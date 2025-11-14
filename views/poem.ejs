@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= section.title %> - حیران</title>
+  <%- include('partials/header', { includePwaMeta: true }) %>
+  <title><%= poet.name %> - <%= book.title %> - <%= section.title %> - حیران</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>

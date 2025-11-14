@@ -1,3 +1,12 @@
+<% if (typeof includePwaMeta !== 'undefined' && includePwaMeta) { %>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="حیران">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="حیران">
+<meta name="theme-color" content="#1d1837">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<% } else { %>
 <header>
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -46,4 +55,5 @@
     </div>
   </div>
 </header>
+<% } %>
 

@@ -31,6 +31,8 @@
    ```
    SESSION_SECRET=choose-a-strong-random-secret
    PORT=5000
+   # اگر دامنه‌ی نهایی‌تان با `req.host` متفاوت است، برای تولید sitemap مقدار زیر را ست کنید
+   # SITEMAP_BASE_URL=https://example.com
    # مقادیر زیر اختیاری‌اند و فقط در صورت فعال‌سازی مجدد Google OAuth لازم می‌شوند
    # GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
    # GOOGLE_CLIENT_SECRET=your-google-client-secret
@@ -42,6 +44,8 @@
    ```bash
    export SESSION_SECRET="choose-a-strong-random-secret"
    export PORT=5000
+   # در صورت نیاز به تولید sitemap با دامنه‌ی واقعی:
+   # export SITEMAP_BASE_URL="https://example.com"
    # برای فعال‌سازی مجدد Google OAuth:
    # export GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
    # export GOOGLE_CLIENT_SECRET="your-google-client-secret"

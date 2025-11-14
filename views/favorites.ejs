@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <%- include('partials/header', { includePwaMeta: true }) %>
   <title>علاقه‌مندی‌ها - حیران</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
@@ -50,10 +51,8 @@
 
       container.innerHTML = sortedFavorites.map(({ id, data }) => {
         const url = `/${data.poetId}/${data.bookId}/${data.sectionId}`;
-        const titleMarkup = data.sectionTitle ? `<h3 class="favorite-title">${data.sectionTitle}</h3>` : '';
         return `
           <div class="favorite-card">
-            ${titleMarkup}
             <div class="favorite-couplet">
               <p class="verse verse-first">${data.verses[0]}</p>
               <p class="verse verse-second">${data.verses[1]}</p>

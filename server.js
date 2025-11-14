@@ -10,6 +10,7 @@ const { run, get, all } = database;
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const SITEMAP_BASE_URL = process.env.SITEMAP_BASE_URL;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -551,6 +552,53 @@ app.delete('/api/posts/:postId/likes', ensureAuthenticated, async (req, res, nex
 
 app.get('/favorites', (req, res) => {
   res.render('favorites', { currentPath: '/favorites' });
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const baseUrl =
+    SITEMAP_BASE_URL ||
+    `${req.protocol}://${req.get('host')}`.replace(/\/+$/, '');
+
+  const urls = [
+    { path: '/', changefreq: 'daily', priority: '1.0' },
+    { path: '/feed', changefreq: 'hourly', priority: '0.8' },
+    { path: '/favorites', changefreq: 'weekly', priority: '0.6' },
+    { path: '/auth/login', changefreq: 'monthly', priority: '0.4' },
+    { path: '/profile/display-name', changefreq: 'monthly', priority: '0.4' }
+  ];
+
+  const data = loadPoems();
+
+  data.poets.forEach(poet => {
+    poet.books.forEach(book => {
+      urls.push({
+        path: `/${poet.id}/${book.id}`,
+        changefreq: 'weekly',
+        priority: '0.7'
+      });
+
+      book.sections.forEach(section => {
+        urls.push({
+          path: `/${poet.id}/${book.id}/${section.id}`,
+          changefreq: 'weekly',
+          priority: '0.6'
+        });
+      });
+    });
+  });
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
+    .map(
+      url => `  <url>
+    <loc>${baseUrl}${url.path}</loc>
+    <changefreq>${url.changefreq}</changefreq>
+    <priority>${url.priority}</priority>
+  </url>`
+    )
+    .join('\n')}\n</urlset>\n`;
+
+  res.header('Content-Type', 'application/xml');
+  res.send(xml);
 });
 
 app.get('/:poetId/:bookId', (req, res) => {
