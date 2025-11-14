@@ -7,13 +7,6 @@
     })(window, document, "clarity", "script", "u2dut8w37e");
   </script>
 
-  <button class="theme-toggle" id="theme-toggle" aria-label="تغییر رنگ پس‌زمینه">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="5" />
-      <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
-    </svg>
-  </button>
-
   <div class="color-picker" id="color-picker" style="display: none;">
     <div class="color-options" id="color-options"></div>
   </div>
@@ -21,24 +14,35 @@
   <div class="header-content">
     <div class="header-title-section">
       <h1><a href="/">حیران</a></h1>
-      <p class="subtitle">مجموعه اشعار پارسی</p>
+      <p class="subtitle">مجموعه اشعار فارسی</p>
     </div>
     <nav class="header-nav">
       <a href="/" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/' ? 'header-nav__link--active' : '' %>">خانه</a>
       <a href="/feed" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/feed' ? 'header-nav__link--active' : '' %>">فید</a>
       <a href="/favorites" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/favorites' ? 'header-nav__link--active' : '' %>">علاقه‌مندی‌ها</a>
-      <a href="/profile/display-name" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath && currentPath.startsWith('/profile') ? 'header-nav__link--active' : '' %>">حساب</a>
+      <a href="/profile/display-name" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath && currentPath.startsWith('/profile') ? 'header-nav__link--active' : '' %>">
+        <% if (currentUser) { %>
+          <%= currentUser.display_name || currentUser.email %>
+        <% } else { %>
+          حساب
+        <% } %>
+      </a>
     </nav>
 
     <div class="header-actions">
-      <% if (currentUser) { %>
-        <div class="header-user">
-          <span class="header-user__name"><%= currentUser.display_name || currentUser.email %></span>
-          <form class="header-user__logout" action="/auth/logout" method="POST">
-            <button type="submit" class="btn btn--ghost">خروج</button>
-          </form>
-        </div>
-      <% } %>
+      <button class="theme-toggle" id="theme-toggle" aria-label="تغییر رنگ پس‌زمینه">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 2.59-2.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z"></path>
+          <path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"></path>
+          <path d="M14.5 17.5 4.5 15"></path>
+        </svg>
+      </button>
+      <a href="/profile/display-name" class="header-account" aria-label="حساب کاربری">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </a>
     </div>
   </div>
 </header>

@@ -27,7 +27,13 @@
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
       <circle cx="12" cy="7" r="4"></circle>
     </svg>
-    <span class="bottom-nav__label">حساب</span>
+    <span class="bottom-nav__label">
+      <% if (currentUser) { %>
+        <%= currentUser.display_name || currentUser.email || 'حساب' %>
+      <% } else { %>
+        حساب
+      <% } %>
+    </span>
   </a>
 </nav>
 

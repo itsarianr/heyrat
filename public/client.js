@@ -262,6 +262,71 @@
     isFavorite
   };
 
+  // ----- Post drafts (localStorage) -----
+  const DRAFT_KEY = 'heyrat_post_draft';
+
+  function savePostDraft(draft) {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch (err) {
+      console.error('Failed to save draft', err);
+    }
+  }
+
+  function loadPostDraft() {
+    try {
+      const stored = localStorage.getItem(DRAFT_KEY);
+      if (!stored) return null;
+      return JSON.parse(stored);
+    } catch (err) {
+      console.error('Failed to load draft', err);
+      return null;
+    }
+  }
+
+  function clearPostDraft() {
+    try {
+      localStorage.removeItem(DRAFT_KEY);
+    } catch (err) {
+      console.error('Failed to clear draft', err);
+    }
+  }
+
+  async function publishDraft() {
+    const draft = loadPostDraft();
+    if (!draft) return false;
+
+    if (!AUTH.isAuthenticated || !AUTH.hasDisplayName) {
+      return false;
+    }
+
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(draft)
+      });
+
+      if (response.status === 401) {
+        return false;
+      }
+
+      if (response.status === 409) {
+        return false;
+      }
+
+      if (!response.ok) {
+        return false;
+      }
+
+      clearPostDraft();
+      return true;
+    } catch (err) {
+      console.error('Failed to publish draft', err);
+      return false;
+    }
+  }
+
   // ----- Post sheet & selection -----
   function initPostSheet() {
     const sheet = document.getElementById('post-sheet');
@@ -409,16 +474,6 @@
       submitBtn.addEventListener('click', async () => {
         if (submitting) return;
 
-        if (!AUTH.isAuthenticated) {
-          window.location.href = '/auth/login';
-          return;
-        }
-
-        if (!AUTH.hasDisplayName) {
-          window.location.href = '/profile/display-name';
-          return;
-        }
-
         if (!state.selection.length) {
           setError('ابتدا ابیاتی را انتخاب کنید.');
           return;
@@ -430,6 +485,36 @@
           return;
         }
 
+        const payload = {
+          poetId: POEM_DATA?.poetId || null,
+          bookId: POEM_DATA?.bookId || null,
+          sectionId: POEM_DATA?.sectionId || null,
+          poetName: POEM_DATA?.poetName || '',
+          bookTitle: POEM_DATA?.bookTitle || '',
+          sectionTitle: POEM_DATA?.sectionTitle || '',
+          body,
+          couplets: state.selection.map(item => ({
+            coupletIndex: item.coupletIndex,
+            verseFirst: item.verseFirst,
+            verseSecond: item.verseSecond
+          }))
+        };
+
+        // If not authenticated, save draft and redirect to login
+        if (!AUTH.isAuthenticated) {
+          savePostDraft(payload);
+          window.location.href = '/auth/login?draft=1';
+          return;
+        }
+
+        // If authenticated but no display name, save draft and redirect
+        if (!AUTH.hasDisplayName) {
+          savePostDraft(payload);
+          window.location.href = '/profile/display-name?draft=1';
+          return;
+        }
+
+        // User is authenticated, submit the post
         submitting = true;
         setError('');
         submitBtn.disabled = true;
@@ -437,21 +522,6 @@
         submitBtn.textContent = 'در حال ارسال...';
 
         try {
-          const payload = {
-            poetId: POEM_DATA?.poetId || null,
-            bookId: POEM_DATA?.bookId || null,
-            sectionId: POEM_DATA?.sectionId || null,
-            poetName: POEM_DATA?.poetName || '',
-            bookTitle: POEM_DATA?.bookTitle || '',
-            sectionTitle: POEM_DATA?.sectionTitle || '',
-            body,
-            couplets: state.selection.map(item => ({
-              coupletIndex: item.coupletIndex,
-              verseFirst: item.verseFirst,
-              verseSecond: item.verseSecond
-            }))
-          };
-
           const response = await fetch('/api/posts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -459,13 +529,15 @@
           });
 
           if (response.status === 401) {
-            window.location.href = '/auth/login';
+            savePostDraft(payload);
+            window.location.href = '/auth/login?draft=1';
             return;
           }
 
           if (response.status === 409) {
+            savePostDraft(payload);
             const data = await response.json().catch(() => ({}));
-            window.location.href = data.redirect || '/profile/display-name';
+            window.location.href = (data.redirect || '/profile/display-name') + '?draft=1';
             return;
           }
 
@@ -477,6 +549,7 @@
 
           const data = await response.json().catch(() => ({}));
           closeSheet();
+          clearPostDraft();
           showToast({
             message: 'نوشتهٔ شما ثبت شد.',
             action: {
@@ -566,14 +639,6 @@
 
     if (postBtn) {
       postBtn.addEventListener('click', () => {
-        if (!AUTH.isAuthenticated) {
-          window.location.href = '/auth/login';
-          return;
-        }
-        if (!AUTH.hasDisplayName) {
-          window.location.href = '/profile/display-name';
-          return;
-        }
         enterSelection('post');
       });
     }
@@ -810,6 +875,9 @@
     });
   }
 
+  // Expose publishDraft for use in other pages
+  window.publishDraft = publishDraft;
+
   function onReady(fn) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', fn);
@@ -818,12 +886,26 @@
     }
   }
 
-  onReady(() => {
+  onReady(async () => {
     initTheme();
     initColorPicker();
     initFavoriteButtons();
     const postSheet = initPostSheet();
     initCoupletSelection(postSheet);
     initFeedInteractions();
+
+    // Check for draft and auto-publish if user is authenticated and has display name
+    // Also check URL params for draft flag (after login/display-name)
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasDraftParam = urlParams.has('draft');
+
+    if (AUTH.isAuthenticated && AUTH.hasDisplayName) {
+      const published = await publishDraft();
+      if (published) {
+        // Redirect to feed page after publishing draft
+        window.location.href = '/feed';
+        return;
+      }
+    }
   });
 })();

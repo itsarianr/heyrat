@@ -38,7 +38,7 @@
           type="text"
           class="auth-form__input"
           value="<%= values && values.displayName ? values.displayName : '' %>"
-          placeholder="این همان نامی است که دیگران شما را می‌شناسند. بهتر است فارسی باشد."
+          placeholder="بهتر است فارسی باشد"
           required
           maxlength="40"
           minlength="2"
@@ -47,6 +47,14 @@
           ذخیره
         </button>
       </form>
+
+      <% if (hasDisplayName) { %>
+        <form class="auth-form__logout" action="/auth/logout" method="POST" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid color-mix(in srgb, var(--theme-text) 15%, transparent);">
+          <button type="submit" class="btn btn--ghost" style="width: 100%;">
+            خروج
+          </button>
+        </form>
+      <% } %>
     </section>
   </main>
 
