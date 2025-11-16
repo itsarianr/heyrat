@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%- include('partials/header', { includePwaMeta: true }) %>
+  <title>صفحه پیدا نشد - حیران</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <main class="not-found-page">
+    <section class="not-found-card">
+      <h1 class="not-found-title">صفحه‌ای که دنبالش بودید پیدا نشد :(</h1>
+      <p class="not-found-subtitle">ممکن است آدرس را اشتباه وارد کرده باشید یا صفحه جابه‌جا شده باشد.</p>
+      <a href="/" class="btn btn--primary not-found-button">بازگشت به صفحهٔ اصلی</a>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>
+
+

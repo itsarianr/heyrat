@@ -10,7 +10,6 @@ const { run, get, all } = database;
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const SITEMAP_BASE_URL = process.env.SITEMAP_BASE_URL;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -555,9 +554,8 @@ app.get('/favorites', (req, res) => {
 });
 
 app.get('/sitemap.xml', (req, res) => {
-  const baseUrl =
-    SITEMAP_BASE_URL ||
-    `${req.protocol}://${req.get('host')}`.replace(/\/+$/, '');
+  // Sitemap should always point to the canonical production domain
+  const baseUrl = 'https://heyraan.com';
 
   const urls = [
     { path: '/', changefreq: 'daily', priority: '1.0' },
@@ -638,6 +636,11 @@ app.get('/:poetId/:bookId/:sectionId', (req, res) => {
   }
   
   res.render('poem', { poet, book, section });
+});
+
+// 404 handler - keep last, after all routes
+app.use((req, res) => {
+  res.status(404).render('404', { currentPath: null });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
