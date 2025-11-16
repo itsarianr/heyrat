@@ -605,12 +605,12 @@ app.get('/:poetId/:bookId', (req, res) => {
 
   const poet = data.poets.find(p => p.id === poetId);
   if (!poet) {
-    return res.status(404).send('شاعر یافت نشد');
+    return res.status(404).render('404', { currentPath: null });
   }
 
   const book = poet.books.find(b => b.id === bookId);
   if (!book) {
-    return res.status(404).send('کتاب یافت نشد');
+    return res.status(404).render('404', { currentPath: null });
   }
 
   res.render('book', { poet, book });
@@ -622,17 +622,17 @@ app.get('/:poetId/:bookId/:sectionId', (req, res) => {
   
   const poet = data.poets.find(p => p.id === poetId);
   if (!poet) {
-    return res.status(404).send('شاعر یافت نشد');
+    return res.status(404).render('404', { currentPath: null });
   }
   
   const book = poet.books.find(b => b.id === bookId);
   if (!book) {
-    return res.status(404).send('کتاب یافت نشد');
+    return res.status(404).render('404', { currentPath: null });
   }
   
   const section = book.sections.find(s => s.id === sectionId);
   if (!section) {
-    return res.status(404).send('بخش یافت نشد');
+    return res.status(404).render('404', { currentPath: null });
   }
   
   res.render('poem', { poet, book, section });
