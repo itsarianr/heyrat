@@ -932,7 +932,7 @@ body.post-sheet-open {
   .favorite-btn {
     position: absolute;
     right: 0; /* Position just outside the text area */
-    top: 25px;
+    top: 20px;
     transform: none;
     padding: 10px 8px;
   }
