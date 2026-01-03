@@ -579,6 +579,8 @@
     const screenshotBtn = document.getElementById('start-selection');
     const postBtn = document.getElementById('start-post');
     const doneBtn = document.getElementById('finish-selection');
+    const doneBtnMobile = document.getElementById('poem-finish-selection-mobile');
+    const fab = document.getElementById('poem-fab');
     const hint = document.getElementById('selection-hint');
     const couplets = document.querySelectorAll('.couplet');
     const poetName = document.querySelector('main nav span:nth-child(3)')?.textContent?.trim() || '';
@@ -628,6 +630,13 @@
         postBtn.style.display = 'none';
       }
       doneBtn.style.display = 'inline-block';
+      // Show mobile finish button and hide FAB
+      if (doneBtnMobile) {
+        doneBtnMobile.style.display = 'flex';
+      }
+      if (fab) {
+        fab.style.display = 'none';
+      }
       showHint();
       couplets.forEach(c => c.classList.add('selectable'));
       document.body.classList.add('selecting-mode');
@@ -762,11 +771,18 @@
       }
     }
 
-    doneBtn.addEventListener('click', async () => {
+    async function handleFinishSelection() {
       if (!selecting) return;
 
       selecting = false;
       doneBtn.style.display = 'none';
+      // Hide mobile finish button and show FAB
+      if (doneBtnMobile) {
+        doneBtnMobile.style.display = 'none';
+      }
+      if (fab) {
+        fab.style.display = 'flex';
+      }
       screenshotBtn.style.display = 'inline-block';
       if (postBtn) {
         postBtn.style.display = 'inline-block';
@@ -798,7 +814,14 @@
       }
 
       mode = null;
-    });
+    }
+
+    // Attach handler to both desktop and mobile finish buttons
+    doneBtn.addEventListener('click', handleFinishSelection);
+
+    if (doneBtnMobile) {
+      doneBtnMobile.addEventListener('click', handleFinishSelection);
+    }
   }
 
   function initFeedInteractions() {
@@ -878,6 +901,268 @@
   // Expose publishDraft for use in other pages
   window.publishDraft = publishDraft;
 
+  // ----- Focus Mode (Mobile) -----
+  function initFocusMode() {
+    const focusMode = document.getElementById('focus-mode');
+    const normalCouplets = document.getElementById('normal-couplets');
+    const focusCouplets = focusMode?.querySelector('.focus-mode__couplets');
+    const prevBtn = document.getElementById('focus-mode-prev');
+    const nextBtn = document.getElementById('focus-mode-next');
+    const exitBtn = document.getElementById('focus-mode-exit');
+    
+    if (!focusMode || !focusCouplets || !prevBtn || !nextBtn || !exitBtn) return;
+
+    let activeIndex = 0;
+    let allCouplets = Array.from(focusCouplets.querySelectorAll('.couplet'));
+    const totalCouplets = allCouplets.length;
+
+    if (totalCouplets === 0) return;
+
+    function getVisibleIndices() {
+      // Show: [activeIndex - 1, activeIndex, activeIndex + 1, activeIndex + 2]
+      const indices = [];
+      const start = Math.max(0, activeIndex - 1);
+      const end = Math.min(totalCouplets - 1, activeIndex + 2);
+      
+      for (let i = start; i <= end; i++) {
+        indices.push(i);
+      }
+      return indices;
+    }
+
+    function updateCoupletVisibility() {
+      const visibleIndices = getVisibleIndices();
+      
+      allCouplets.forEach((couplet, index) => {
+        const isVisible = visibleIndices.includes(index);
+        const isActive = index === activeIndex;
+        
+        if (isVisible) {
+          couplet.style.display = '';
+          couplet.classList.toggle('couplet--active', isActive);
+          couplet.classList.toggle('couplet--inactive', !isActive);
+          
+          // Add animation class
+          couplet.classList.add('couplet--transitioning');
+          setTimeout(() => {
+            couplet.classList.remove('couplet--transitioning');
+          }, 300);
+        } else {
+          couplet.style.display = 'none';
+          couplet.classList.remove('couplet--active', 'couplet--inactive');
+        }
+      });
+    }
+
+    function updateNavigationButtons() {
+      prevBtn.disabled = activeIndex === 0;
+      nextBtn.disabled = activeIndex === totalCouplets - 1;
+    }
+
+    function goToNextCouplet() {
+      if (activeIndex < totalCouplets - 1) {
+        activeIndex++;
+        updateCoupletVisibility();
+        updateNavigationButtons();
+      }
+    }
+
+    function goToPreviousCouplet() {
+      if (activeIndex > 0) {
+        activeIndex--;
+        updateCoupletVisibility();
+        updateNavigationButtons();
+      }
+    }
+
+    function enterFocusMode() {
+      // Hide normal view elements
+      if (normalCouplets) normalCouplets.style.display = 'none';
+      const header = document.querySelector('header');
+      const breadcrumb = document.querySelector('.breadcrumb');
+      const poemTitle = document.querySelector('.poem h2');
+      const screenshotControls = document.querySelector('.screenshot-controls');
+      const poemNav = document.querySelector('.poem-nav');
+      const bottomNav = document.querySelector('.bottom-nav');
+      const fab = document.getElementById('poem-fab');
+      
+      if (header) header.style.display = 'none';
+      if (breadcrumb) breadcrumb.style.display = 'none';
+      if (poemTitle) poemTitle.style.display = 'none';
+      if (screenshotControls) screenshotControls.style.display = 'none';
+      if (poemNav) poemNav.style.display = 'none';
+      if (bottomNav) bottomNav.style.display = 'none';
+      if (fab) fab.style.display = 'none';
+      
+      // Show focus mode
+      focusMode.style.display = 'block';
+      document.body.classList.add('focus-mode-active');
+      
+      // Initialize state
+      activeIndex = 0;
+      updateCoupletVisibility();
+      updateNavigationButtons();
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function exitFocusMode() {
+      // Show normal view elements
+      if (normalCouplets) normalCouplets.style.display = '';
+      const header = document.querySelector('header');
+      const breadcrumb = document.querySelector('.breadcrumb');
+      const poemTitle = document.querySelector('.poem h2');
+      const screenshotControls = document.querySelector('.screenshot-controls');
+      const poemNav = document.querySelector('.poem-nav');
+      const bottomNav = document.querySelector('.bottom-nav');
+      const fab = document.getElementById('poem-fab');
+      
+      if (header) header.style.display = '';
+      if (breadcrumb) breadcrumb.style.display = '';
+      if (poemTitle) poemTitle.style.display = '';
+      if (screenshotControls) screenshotControls.style.display = '';
+      if (poemNav) poemNav.style.display = '';
+      if (bottomNav) bottomNav.style.display = '';
+      if (fab) fab.style.display = '';
+      
+      // Hide focus mode
+      focusMode.style.display = 'none';
+      document.body.classList.remove('focus-mode-active');
+      
+      // Scroll to active couplet in normal view
+      const activeCouplet = normalCouplets?.querySelector(`[data-couplet-index="${activeIndex}"]`);
+      if (activeCouplet) {
+        activeCouplet.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // Event listeners
+    prevBtn.addEventListener('click', goToPreviousCouplet);
+    nextBtn.addEventListener('click', goToNextCouplet);
+    exitBtn.addEventListener('click', exitFocusMode);
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (!document.body.classList.contains('focus-mode-active')) return;
+      
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        goToNextCouplet();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        goToPreviousCouplet();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        exitFocusMode();
+      }
+    });
+
+    // Expose enterFocusMode for FAB menu
+    window.enterFocusMode = enterFocusMode;
+  }
+
+  // ----- Poem FAB Menu (Mobile) -----
+  function initPoemFabMenu() {
+    const fab = document.getElementById('poem-fab');
+    const menu = document.getElementById('poem-fab-menu');
+    if (!fab || !menu) return;
+
+    const backdrop = menu.querySelector('.poem-fab-menu__backdrop');
+    const menuItems = menu.querySelectorAll('.poem-fab-menu__item');
+    let isOpen = false;
+
+    function openMenu() {
+      isOpen = true;
+      fab.style.opacity = '0';
+      setTimeout(() => {
+        if (isOpen) {
+          fab.style.display = 'none';
+        }
+      }, 150);
+      menu.classList.add('poem-fab-menu--open');
+      fab.setAttribute('aria-expanded', 'true');
+      menu.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeMenu() {
+      isOpen = false;
+      menu.classList.remove('poem-fab-menu--open');
+      fab.setAttribute('aria-expanded', 'false');
+      menu.setAttribute('aria-hidden', 'true');
+      // Show FAB again after menu closes (with slight delay for animation)
+      setTimeout(() => {
+        if (!isOpen) {
+          fab.style.display = 'flex';
+          requestAnimationFrame(() => {
+            fab.style.opacity = '1';
+          });
+        }
+      }, 200);
+    }
+
+    function toggleMenu() {
+      if (isOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+
+    // FAB click toggles menu
+    fab.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    // Backdrop click closes menu
+    if (backdrop) {
+      backdrop.addEventListener('click', closeMenu);
+    }
+
+    // Menu item clicks
+    menuItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = item.dataset.action;
+        closeMenu();
+
+        if (action === 'screenshot') {
+          // Trigger screenshot button click
+          const screenshotBtn = document.getElementById('start-selection');
+          if (screenshotBtn) {
+            screenshotBtn.click();
+          }
+        } else if (action === 'post') {
+          // Trigger post button click
+          const postBtn = document.getElementById('start-post');
+          if (postBtn) {
+            postBtn.click();
+          }
+        } else if (action === 'focus') {
+          // Enter focus mode
+          if (window.enterFocusMode) {
+            window.enterFocusMode();
+          }
+        }
+      });
+    });
+
+    // Close menu on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        closeMenu();
+      }
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (isOpen && !menu.contains(e.target) && !fab.contains(e.target)) {
+        closeMenu();
+      }
+    });
+  }
+
   function onReady(fn) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', fn);
@@ -893,6 +1178,8 @@
     const postSheet = initPostSheet();
     initCoupletSelection(postSheet);
     initFeedInteractions();
+    initPoemFabMenu();
+    initFocusMode();
 
     // Check for draft and auto-publish if user is authenticated and has display name
     // Also check URL params for draft flag (after login/display-name)
