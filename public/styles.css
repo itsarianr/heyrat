@@ -675,7 +675,7 @@ body.post-sheet-open {
   align-items: flex-end;
   justify-content: center;
   z-index: 1200;
-  padding: 0 16px;
+  padding: 0;
 }
 .post-sheet--open {
   display: flex;
@@ -689,7 +689,7 @@ body.post-sheet-open {
   position: relative;
   background: var(--theme-bg);
   color: var(--theme-text);
-  width: min(640px, 100%);
+  width: 100%;
   border-radius: 22px 22px 0 0;
   padding: 28px 24px 22px;
   box-shadow: 0 -18px 48px color-mix(in srgb, var(--theme-text) 30%, transparent);
@@ -910,7 +910,7 @@ body.post-sheet-open {
 
 /* --- Responsive: on small screens keep readable stacked view on page ---- */
 @media (max-width: 600px) {
-  body { padding: 15px; }
+  body { padding: 10px; }
   header h1 { font-size: 2em; }
   .poem h2 { font-size: 1.5em; }
 
@@ -1337,10 +1337,9 @@ footer {
   left: 0;
   right: 0;
   background: var(--theme-bg);
-  border-top: 1px solid var(--theme-text);
   padding: 6px 0;
   z-index: 1000;
-  box-shadow: 0 -2px 8px color-mix(in srgb, var(--theme-text) 10%, transparent);
+  box-shadow: 0 -2px 8px color-mix(in srgb, var(--theme-text) 15%, transparent);
 }
 .bottom-nav__item {
   display: flex;
@@ -1403,46 +1402,54 @@ footer {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--theme-text) 70%, transparent);
-  color: var(--theme-bg);
-  border: none;
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--theme-text) 30%, transparent);
+  background: var(--theme-bg);
+  color: var(--theme-text);
+  border: 1px solid color-mix(in srgb, var(--theme-text) 15%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-text) 15%, transparent);
   cursor: pointer;
   z-index: 1000;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.18s ease;
   padding: 0;
-  opacity: 1;
+  opacity: 0.6;
 }
 
 .poem-fab:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--theme-text) 35%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--theme-text) 20%, transparent);
+  opacity: 0.8;
 }
 
 .poem-fab:active {
   transform: scale(0.95);
+  color: var(--theme-text);
+  opacity: 0.6;
 }
 
 .poem-fab__icon {
   width: 24px;
   height: 24px;
   stroke: currentColor;
+  transition: none;
 }
 
 .poem-fab-menu {
-  display: none;
   position: fixed;
   bottom: 100px;
   right: 20px;
   z-index: 1001;
   pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 0.2s, opacity 0.2s ease-out;
 }
 
 .poem-fab-menu--open {
-  display: block;
+  visibility: visible;
+  opacity: 1;
   pointer-events: auto;
+  transition: visibility 0s linear 0s, opacity 0.2s ease-out;
 }
 
 .poem-fab-menu__backdrop {
@@ -1461,9 +1468,9 @@ footer {
   overflow: hidden;
   min-width: 200px;
   z-index: 1002;
-  transform: translateY(8px) scale(0.95);
+  transform: translateY(4px) scale(0.98);
   opacity: 0;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .poem-fab-menu--open .poem-fab-menu__panel {
@@ -1568,12 +1575,22 @@ footer {
 /* --- Focus Mode (Mobile Only) --- */
 .focus-mode {
   display: none;
-  min-height: calc(100vh - 80px);
-  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 120px;
+  overflow: hidden;
+  padding: 0;
+  z-index: 999;
 }
 
 .focus-mode-active .focus-mode {
   display: block;
+}
+
+.focus-mode-active {
+  overflow: hidden;
 }
 
 .focus-mode__couplets {
@@ -1582,12 +1599,21 @@ footer {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: calc(100vh - 160px);
-  padding: 40px 0;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
 }
 
 .focus-mode .couplet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 2.5em;
+  padding: 0;
+  gap: 0;
+  width: 100%;
+  position: static;
   transition: opacity 0.3s ease, transform 0.3s ease;
   opacity: 1;
 }
@@ -1623,6 +1649,17 @@ footer {
 
 .focus-mode .favorite-btn {
   display: none;
+}
+
+.focus-mode .verse {
+  text-align: center;
+  margin: 0;
+  width: 100%;
+  padding: 0;
+}
+
+.focus-mode .verse + .verse {
+  margin-top: 0.5em;
 }
 
 .focus-mode-nav {
@@ -1731,7 +1768,8 @@ footer {
 .focus-mode-nav__arrow-icon {
   width: 32px;
   height: 32px;
-  fill: currentColor;
+  fill: none;
+  stroke: currentColor;
 }
 
 .focus-mode-nav__arrow-separator {

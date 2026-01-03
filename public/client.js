@@ -543,7 +543,7 @@
 
           if (!response.ok) {
             const data = await response.json().catch(() => ({}));
-            setError(data?.error || 'ارسال نوشته با مشکل روبه‌رو شد.');
+            setError(data?.error || 'ارسال دل‌نوشته با مشکل روبه‌رو شد.');
             return;
           }
 
@@ -551,15 +551,15 @@
           closeSheet();
           clearPostDraft();
           showToast({
-            message: 'نوشتهٔ شما ثبت شد.',
+            message: 'دل‌نوشتهٔ شما ثبت شد.',
             action: {
-              label: 'مشاهده فید',
+              label: 'مشاهده دل‌نوشته‌ها',
               href: data.feedUrl || '/feed'
             }
           });
         } catch (err) {
           console.error('create post error', err);
-          setError('ارسال نوشته با مشکل مواجه شد. لطفاً دوباره تلاش کنید.');
+          setError('ارسال دل‌نوشته با مشکل مواجه شد. لطفاً دوباره تلاش کنید.');
         } finally {
           submitting = false;
           submitBtn.disabled = false;

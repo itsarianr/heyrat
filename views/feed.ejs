@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <%- include('partials/header', { includePwaMeta: true }) %>
-  <title>فید نوشته‌ها - حیران</title>
+  <title>دل‌نوشته‌ها - حیران</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
 
   <main class="feed-page">
     <header class="feed-page__intro">
-      <h2 class="feed-page__title">نوشته‌های کاربران حیران</h2>
+      <h2 class="feed-page__title">دل‌نوشته‌های کاربران حیران</h2>
       <p class="feed-page__subtitle">
         آخرین تجربه‌ها و برداشت‌های خوانندگان از ابیات انتخاب‌شده را مرور کنید.
       </p>
@@ -21,7 +21,7 @@
     <section id="feed" class="feed-list">
       <% if (!posts || posts.length === 0) { %>
         <p class="feed-list__empty">
-          هنوز نوشته‌ای ثبت نشده است. نخستین نفری باشید که درباره ابیات محبوبتان می‌نویسید.
+          هنوز دل‌نوشته‌ای ثبت نشده است. نخستین نفری باشید که درباره ابیات محبوبتان می‌نویسید.
         </p>
       <% } else { %>
         <% posts.forEach(post => { %>

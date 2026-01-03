@@ -39,7 +39,7 @@
     </div>
     <nav class="header-nav">
       <a href="/" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/' ? 'header-nav__link--active' : '' %>">خانه</a>
-      <a href="/feed" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/feed' ? 'header-nav__link--active' : '' %>">فید</a>
+      <a href="/feed" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/feed' ? 'header-nav__link--active' : '' %>">دل‌نوشته‌ها</a>
       <a href="/favorites" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath === '/favorites' ? 'header-nav__link--active' : '' %>">علاقه‌مندی‌ها</a>
       <a href="/profile/display-name" class="header-nav__link <%= typeof currentPath !== 'undefined' && currentPath && currentPath.startsWith('/profile') ? 'header-nav__link--active' : '' %>">
         <% if (currentUser) { %>

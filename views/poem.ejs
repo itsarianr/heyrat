@@ -30,7 +30,7 @@
       <div class="screenshot-controls">
         <button id="start-post" class="post-launch-btn">
           <span class="post-launch-btn__icon" aria-hidden="true">&#9998;</span>
-          <span class="post-launch-btn__label">ایجاد نوشته</span>
+          <span class="post-launch-btn__label">ایجاد دل‌نوشته</span>
         </button>
         <button id="start-selection">ساخت تصویر از شعر</button>
         <button id="finish-selection" style="display:none;">پایان انتخاب</button>
@@ -38,10 +38,13 @@
 
       <!-- Mobile FAB and Menu -->
       <button class="poem-fab" id="poem-fab" aria-label="منو" aria-expanded="false">
-        <svg class="poem-fab__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
+        <svg class="poem-fab__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 6h4"/>
+          <path d="M2 10h4"/>
+          <path d="M2 14h4"/>
+          <path d="M2 18h4"/>
+          <rect width="16" height="20" x="4" y="2" rx="2"/>
+          <path d="M16 2v20"/>
         </svg>
       </button>
       <!-- Mobile Finish Selection Button -->
@@ -50,28 +53,25 @@
         <div class="poem-fab-menu__backdrop" data-fab-close></div>
         <div class="poem-fab-menu__panel">
           <button class="poem-fab-menu__item" data-action="screenshot">
-            <svg class="poem-fab-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
+            <svg class="poem-fab-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v13"/>
+              <path d="m16 6-4-4-4 4"/>
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
             </svg>
-            <span class="poem-fab-menu__label">ساخت تصویر از ابیات</span>
+            <span class="poem-fab-menu__label">اشتراک‌گذاری ابیات</span>
           </button>
           <button class="poem-fab-menu__item" data-action="post">
-            <svg class="poem-fab-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
+            <svg class="poem-fab-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m14.479 19.374-.971.939a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5a5.2 5.2 0 0 1-.219 1.49"/>
+              <path d="M15 15h6"/>
+              <path d="M18 12v6"/>
             </svg>
-            <span class="poem-fab-menu__label">ایجاد نوشته</span>
+            <span class="poem-fab-menu__label">ایجاد دل‌نوشته</span>
           </button>
           <button class="poem-fab-menu__item" data-action="focus">
-            <svg class="poem-fab-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="9" y1="3" x2="9" y2="21"></line>
-              <line x1="15" y1="3" x2="15" y2="21"></line>
+            <svg class="poem-fab-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
             </svg>
             <span class="poem-fab-menu__label">حالت تمرکز</span>
           </button>
@@ -109,14 +109,16 @@
           </button>
           <div class="focus-mode-nav__arrows">
             <button class="focus-mode-nav__arrow" id="focus-mode-prev" aria-label="بیت قبلی">
-              <svg class="focus-mode-nav__arrow-icon" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="12 8 8 12 16 12 12 8"></polygon>
+              <svg class="focus-mode-nav__arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 13a1 1 0 0 0-1-1H5.061a1 1 0 0 1-.75-1.811l6.836-6.835a1.207 1.207 0 0 1 1.707 0l6.835 6.835a1 1 0 0 1-.75 1.811H16a1 1 0 0 0-1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/>
+                <path d="M9 20h6"/>
               </svg>
             </button>
             <div class="focus-mode-nav__arrow-separator"></div>
             <button class="focus-mode-nav__arrow" id="focus-mode-next" aria-label="بیت بعدی">
-              <svg class="focus-mode-nav__arrow-icon" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="12 16 16 12 8 12 12 16"></polygon>
+              <svg class="focus-mode-nav__arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 11a1 1 0 0 0 1 1h2.939a1 1 0 0 1 .75 1.811l-6.835 6.836a1.207 1.207 0 0 1-1.707 0L4.31 13.81a1 1 0 0 1 .75-1.811H8a1 1 0 0 0 1-1V9a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1z"/>
+                <path d="M9 4h6"/>
               </svg>
             </button>
           </div>
@@ -160,7 +162,7 @@
       <div class="post-sheet__backdrop" data-sheet-close></div>
       <div class="post-sheet__panel" role="dialog" aria-modal="true" aria-labelledby="post-sheet-title">
         <header class="post-sheet__header">
-          <h3 id="post-sheet-title">نوشتن درباره ابیات انتخاب‌شده</h3>
+          <h3 id="post-sheet-title">دربارهٔ این ابیات بنویسید</h3>
           <button type="button" class="post-sheet__close" data-sheet-close aria-label="بستن">&times;</button>
         </header>
 
@@ -169,7 +171,7 @@
           <p class="post-sheet__error" id="post-sheet-error" hidden></p>
 
           <label class="post-sheet__label" for="post-textarea">
-            متن نوشته
+            متن دل‌نوشته
             <span class="post-sheet__char-count" id="post-char-count">۰ / ۲۸۰</span>
           </label>
           <textarea
@@ -183,7 +185,7 @@
 
         <footer class="post-sheet__footer">
           <button type="button" class="btn btn--ghost" data-sheet-close>انصراف</button>
-          <button type="button" class="btn btn--primary" id="post-submit-btn">انتشار نوشته</button>
+          <button type="button" class="btn btn--primary" id="post-submit-btn">انتشار دل‌نوشته</button>
         </footer>
       </div>
     </section>
@@ -209,8 +211,8 @@
       window.POEM_DATA = null;
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="/client.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" async></script>
 </body>
 </html>
 

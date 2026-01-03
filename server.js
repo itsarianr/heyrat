@@ -57,8 +57,10 @@ function loadPoems() {
     });
     
     if (books.length > 0) {
+      // Extract poet ID from directory name (remove numeric prefix like "01-")
+      const poetId = poetFolder.replace(/^\d+-/, '');
       poets.push({
-        id: poetFolder,
+        id: poetId,
         name: books[0].poet.name,
         books: books
       });
