@@ -946,7 +946,7 @@
           couplet.classList.add('couplet--transitioning');
           setTimeout(() => {
             couplet.classList.remove('couplet--transitioning');
-          }, 300);
+          }, 500);
         } else {
           couplet.style.display = 'none';
           couplet.classList.remove('couplet--active', 'couplet--inactive');
@@ -1058,6 +1058,33 @@
       }
     });
 
+    // Touch/Swipe navigation
+    let touchStartY = 0;
+    let touchEndY = 0;
+    const minSwipeDistance = 50; // Minimum distance for a swipe
+
+    focusMode.addEventListener('touchstart', (e) => {
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    focusMode.addEventListener('touchend', (e) => {
+      if (!document.body.classList.contains('focus-mode-active')) return;
+      
+      touchEndY = e.changedTouches[0].screenY;
+      const swipeDistance = touchEndY - touchStartY;
+      
+      // Check if swipe distance is significant enough
+      if (Math.abs(swipeDistance) >= minSwipeDistance) {
+        if (swipeDistance < 0) {
+          // Swipe up (negative distance) = next couplet
+          goToNextCouplet();
+        } else {
+          // Swipe down (positive distance) = previous couplet
+          goToPreviousCouplet();
+        }
+      }
+    }, { passive: true });
+
     // Expose enterFocusMode for FAB menu
     window.enterFocusMode = enterFocusMode;
   }
@@ -1095,7 +1122,7 @@
         if (!isOpen) {
           fab.style.display = 'flex';
           requestAnimationFrame(() => {
-            fab.style.opacity = '1';
+            fab.style.opacity = '0.6';
           });
         }
       }, 200);
@@ -1163,6 +1190,152 @@
     });
   }
 
+  // ----- Section List Pagination (API-based Lazy Loading) -----
+  function initSectionPagination() {
+    const sectionList = document.getElementById('section-list');
+    const loader = document.getElementById('section-loader');
+    const bookSection = document.querySelector('.book[data-poet-id][data-book-id]');
+    
+    if (!sectionList || !loader || !bookSection) return;
+    
+    const poetId = bookSection.dataset.poetId;
+    const bookId = bookSection.dataset.bookId;
+    const totalSections = parseInt(sectionList.dataset.totalSections, 10);
+    let currentPage = parseInt(sectionList.dataset.currentPage, 10);
+    let isLoading = false;
+    const loadedCountEl = document.getElementById('loaded-count');
+    
+    async function loadMoreSections() {
+      if (isLoading) return;
+      
+      isLoading = true;
+      loader.classList.add('section-loader--loading');
+      
+      const nextPage = currentPage + 1;
+      
+      try {
+        const response = await fetch(`/api/books/${poetId}/${bookId}/sections?page=${nextPage}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to load sections');
+        }
+        
+        const data = await response.json();
+        
+        if (data.sections && data.sections.length > 0) {
+          // Add new sections to the list
+          data.sections.forEach((section, index) => {
+            const li = document.createElement('li');
+            li.className = 'section-item section-item--revealing';
+            li.innerHTML = `
+              <a href="/${poetId}/${bookId}/${section.id}">
+                <span>${section.title}</span>
+              </a>
+            `;
+            sectionList.appendChild(li);
+            
+            // Remove animation class after it completes
+            setTimeout(() => {
+              li.classList.remove('section-item--revealing');
+            }, 400 + (index * 30)); // Staggered animation
+          });
+          
+          currentPage = data.page;
+          sectionList.dataset.currentPage = currentPage;
+          
+          // Update progress counter
+          const currentCount = sectionList.querySelectorAll('.section-item').length;
+          if (loadedCountEl) {
+            loadedCountEl.textContent = currentCount.toLocaleString('fa-IR');
+          }
+          
+          // Hide loader if no more sections
+          if (!data.hasMore) {
+            loader.style.display = 'none';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading sections:', error);
+        loader.querySelector('.section-loader__text').textContent = 'خطا در بارگذاری. دوباره تلاش کنید.';
+      } finally {
+        loader.classList.remove('section-loader--loading');
+        isLoading = false;
+      }
+    }
+    
+    // Scroll-based detection
+    function handleScroll() {
+      if (isLoading || loader.style.display === 'none') return;
+      
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const loaderPosition = loader.offsetTop;
+      
+      // Trigger when user is within 300px of the loader
+      if (scrollPosition >= loaderPosition - 300) {
+        loadMoreSections();
+      }
+    }
+    
+    // Throttle scroll events for performance
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+      if (scrollTimeout) return;
+      scrollTimeout = setTimeout(() => {
+        handleScroll();
+        scrollTimeout = null;
+      }, 150);
+    }, { passive: true });
+    
+    // Also trigger on initial load if page is short
+    handleScroll();
+  }
+
+  // ----- Random Section Button -----
+  function initRandomSectionButton() {
+    const btn = document.getElementById('random-section-btn');
+    if (!btn) return;
+
+    const sectionIds = JSON.parse(btn.dataset.sectionIds);
+    const poetId = btn.dataset.poetId;
+    const bookId = btn.dataset.bookId;
+    const textSpan = btn.querySelector('.random-section-btn__text');
+    const originalText = 'فال شما';
+    const loadingText = 'در حال گرفتن فال شما...';
+
+    function resetButtonState() {
+      btn.classList.remove('random-section-btn--loading');
+      btn.disabled = false;
+      textSpan.textContent = originalText;
+    }
+
+    // Reset on initial load
+    resetButtonState();
+
+    // Handle back-forward cache restore (Chrome/Safari)
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        // Page was restored from bfcache
+        resetButtonState();
+      }
+    });
+
+    btn.addEventListener('click', () => {
+      // Add loading state
+      btn.classList.add('random-section-btn--loading');
+      btn.disabled = true;
+      textSpan.textContent = loadingText;
+
+      // Generate random index
+      const randomIndex = Math.floor(Math.random() * sectionIds.length);
+      const randomSectionId = sectionIds[randomIndex];
+
+      // Navigate after 1 second (allowing animation to complete)
+      setTimeout(() => {
+        window.location.href = `/${poetId}/${bookId}/${randomSectionId}`;
+      }, 1000);
+    });
+  }
+
   function onReady(fn) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', fn);
@@ -1180,6 +1353,8 @@
     initFeedInteractions();
     initPoemFabMenu();
     initFocusMode();
+    initSectionPagination();
+    initRandomSectionButton();
 
     // Check for draft and auto-publish if user is authenticated and has display name
     // Also check URL params for draft flag (after login/display-name)

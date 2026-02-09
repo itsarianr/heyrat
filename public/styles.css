@@ -4,6 +4,7 @@
 @font-face {
   font-family: 'Ravi';
   src: url('Ravi-VF.ttf') format('truetype');
+  font-display: swap;
 }
 
 :root {
@@ -26,13 +27,16 @@ body {
 /* --- Header --- */
 header {
   position: relative;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-text) 12%, transparent);
 }
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 0;
 }
 .header-title-section {
   flex: 1;
@@ -337,7 +341,7 @@ header h1 a:hover { text-decoration: underline; }
 
 /* --- Main / breadcrumb --- */
 main { min-height: 60vh; }
-.breadcrumb { margin-bottom: 30px; font-size: 0.95em; color: var(--theme-text); opacity: 0.7; }
+.breadcrumb { margin-bottom: 24px; margin-top: 4px; font-size: 0.95em; color: var(--theme-text); opacity: 0.7; }
 .breadcrumb a { color: var(--theme-text); text-decoration: none; }
 .breadcrumb a:hover { text-decoration: underline; opacity: 1; }
 .breadcrumb span { margin: 0 4px; }
@@ -352,7 +356,11 @@ main { min-height: 60vh; }
 
 /* --- Index page styles --- */
 .poet-section {
-  margin-bottom: 50px;
+  margin-bottom: 40px;
+}
+
+.poet-section:first-child {
+  margin-top: 8px;
 }
 .poet-name {
   font-size: 1.8em;
@@ -388,6 +396,20 @@ main { min-height: 60vh; }
   font-size: 0.85em;
   opacity: 0.65;
   margin: 0;
+}
+
+@media (max-width: 680px) {
+  .book-card {
+    transition: none;
+  }
+  .book-card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: color-mix(in srgb, var(--theme-text) 20%, transparent);
+  }
+  .book-card:active {
+    opacity: 0.8;
+  }
 }
 
 .feed-cta {
@@ -442,9 +464,53 @@ main { min-height: 60vh; }
 .book .poet {
   color: var(--theme-text);
   opacity: 0.7;
-  margin-bottom: 24px;
+  margin-bottom: 8px;
   font-size: 0.95em;
 }
+
+.random-section-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--theme-text) 25%, transparent);
+  border-radius: 8px;
+  color: var(--theme-text);
+  font-family: inherit;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  opacity: 0.7;
+}
+
+.random-section-btn:hover {
+  background: color-mix(in srgb, var(--theme-text) 6%, transparent);
+  border-color: color-mix(in srgb, var(--theme-text) 40%, transparent);
+  opacity: 0.9;
+}
+
+.random-section-btn:active {
+  opacity: 1;
+}
+
+.random-section-btn__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.random-section-btn--loading .random-section-btn__text {
+  animation: textPulse 0.5s ease-in-out 2;
+}
+
+@keyframes textPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
 .section-list {
   list-style: none;
   margin: 0;
@@ -464,6 +530,81 @@ main { min-height: 60vh; }
 }
 .section-item a:hover {
   background-color: color-mix(in srgb, var(--theme-text) 12%, transparent);
+}
+
+/* Revealing animation for lazy loaded sections */
+.section-item--revealing {
+  animation: sectionReveal 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes sectionReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section loader */
+.section-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 20px;
+  margin-top: 20px;
+  text-align: center;
+  color: var(--theme-text);
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.section-loader--loading {
+  opacity: 1;
+}
+
+.section-loader__text {
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-loader__text::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid color-mix(in srgb, var(--theme-text) 20%, transparent);
+  border-top-color: var(--theme-text);
+  border-radius: 50%;
+  animation: loaderSpin 0.8s linear infinite;
+}
+
+.section-loader--loading .section-loader__text::before {
+  animation-play-state: running;
+}
+
+.section-loader:not(.section-loader--loading) .section-loader__text::before {
+  animation-play-state: paused;
+  opacity: 0.5;
+}
+
+@keyframes loaderSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.section-loader__progress {
+  font-size: 0.8em;
+  opacity: 0.7;
 }
 
 /* --- Poem --- */
@@ -910,9 +1051,9 @@ body.post-sheet-open {
 
 /* --- Responsive: on small screens keep readable stacked view on page ---- */
 @media (max-width: 600px) {
-  body { padding: 10px; }
-  header h1 { font-size: 2em; }
-  .poem h2 { font-size: 1.5em; }
+  body { padding: 16px; }
+  header h1 { font-size: 1.9em; }
+  .poem h2 { font-size: 1.5em; margin-top: 8px; }
 
   /* keep on-page couplets stacked (original behavior) */
   .couplet { flex-direction: column; gap: 0; }
@@ -958,8 +1099,9 @@ body.post-sheet-open {
   
   .header-content {
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
+    gap: 12px;
   }
   /* Hide profile icon on mobile (already in bottom nav) */
   .header-account {
@@ -1337,7 +1479,7 @@ footer {
   left: 0;
   right: 0;
   background: var(--theme-bg);
-  padding: 6px 0;
+  padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
   z-index: 1000;
   box-shadow: 0 -2px 8px color-mix(in srgb, var(--theme-text) 15%, transparent);
 }
@@ -1386,10 +1528,10 @@ footer {
 /* Add padding to body on mobile to account for bottom nav */
 @media (max-width: 680px) {
   body {
-    padding-bottom: 70px;
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
   }
   body.focus-mode-active {
-    padding-bottom: 80px; /* Account for focus mode nav */
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); /* Account for focus mode nav */
   }
 }
 
@@ -1398,11 +1540,11 @@ footer {
   display: none;
   position: fixed;
   bottom: 100px;
-  right: 20px;
+  left: 20px;
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--theme-bg);
+  background: transparent;
   color: var(--theme-text);
   border: 1px solid color-mix(in srgb, var(--theme-text) 15%, transparent);
   box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-text) 15%, transparent);
@@ -1437,19 +1579,19 @@ footer {
 .poem-fab-menu {
   position: fixed;
   bottom: 100px;
-  right: 20px;
+  left: 20px;
   z-index: 1001;
   pointer-events: none;
   visibility: hidden;
   opacity: 0;
-  transition: visibility 0s linear 0.2s, opacity 0.2s ease-out;
+  transition: visibility 0s linear 0.35s, opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .poem-fab-menu--open {
   visibility: visible;
   opacity: 1;
   pointer-events: auto;
-  transition: visibility 0s linear 0s, opacity 0.2s ease-out;
+  transition: visibility 0s linear 0s, opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .poem-fab-menu__backdrop {
@@ -1463,19 +1605,33 @@ footer {
   position: relative;
   background: var(--theme-bg);
   border: 1px solid color-mix(in srgb, var(--theme-text) 20%, transparent);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--theme-text) 25%, transparent);
+  border-radius: 20px;
+  box-shadow: 
+    0 4px 6px -1px color-mix(in srgb, var(--theme-text) 10%, transparent),
+    0 10px 15px -3px color-mix(in srgb, var(--theme-text) 15%, transparent),
+    0 20px 25px -5px color-mix(in srgb, var(--theme-text) 10%, transparent);
   overflow: hidden;
   min-width: 200px;
   z-index: 1002;
-  transform: translateY(4px) scale(0.98);
+  transform: translateY(20px) scale(0.92);
   opacity: 0;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: blur(2px);
+  transition: 
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity, filter;
 }
 
 .poem-fab-menu--open .poem-fab-menu__panel {
   transform: translateY(0) scale(1);
   opacity: 1;
+  filter: blur(0);
+  box-shadow: 
+    0 10px 15px -3px color-mix(in srgb, var(--theme-text) 20%, transparent),
+    0 20px 25px -5px color-mix(in srgb, var(--theme-text) 15%, transparent),
+    0 25px 50px -12px color-mix(in srgb, var(--theme-text) 25%, transparent);
 }
 
 .poem-fab-menu__item {
@@ -1492,7 +1648,26 @@ footer {
   font-size: 0.95em;
   text-align: right;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.2s ease;
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.poem-fab-menu--open .poem-fab-menu__item {
+  opacity: 1;
+  transform: translateX(0);
+  transition: 
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s,
+    background-color 0.2s ease;
+}
+
+.poem-fab-menu--open .poem-fab-menu__item:nth-child(2) {
+  transition-delay: 0.15s;
+}
+
+.poem-fab-menu--open .poem-fab-menu__item:nth-child(3) {
+  transition-delay: 0.2s;
 }
 
 .poem-fab-menu__item:last-child {
@@ -1614,14 +1789,18 @@ footer {
   gap: 0;
   width: 100%;
   position: static;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), 
+              transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+              filter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
   opacity: 1;
+  will-change: opacity, transform, filter;
 }
 
 .focus-mode .couplet--active {
   font-weight: bold;
   opacity: 1;
-  transform: scale(1);
+  transform: scale(1) translateY(0);
+  filter: blur(0);
 }
 
 .focus-mode .couplet--active .verse {
@@ -1632,8 +1811,9 @@ footer {
 
 .focus-mode .couplet--inactive {
   font-weight: normal;
-  opacity: 0.4;
-  transform: scale(0.98);
+  opacity: 0.3;
+  transform: scale(0.95) translateY(10px);
+  filter: blur(1px);
 }
 
 .focus-mode .couplet--inactive .verse {
@@ -1643,8 +1823,9 @@ footer {
 }
 
 .focus-mode .couplet--transitioning {
-  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), 
+              transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+              filter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .focus-mode .favorite-btn {
@@ -1746,6 +1927,8 @@ footer {
   transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
   color: color-mix(in srgb, var(--theme-text) 60%, transparent);
   opacity: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .focus-mode-nav__arrow:hover:not(:disabled) {

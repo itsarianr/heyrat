@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
 const database = require('./db');
-const { passport, ensureAuthenticated, isGoogleConfigured } = require('./auth');
+const { passport, ensureAuthenticated } = require('./auth');
 const { run, get, all } = database;
 
 const app = express();
@@ -33,7 +33,6 @@ app.use(passport.session());
 
 app.use((req, res, next) => {
   res.locals.currentUser = req.user || null;
-  res.locals.isGoogleConfigured = isGoogleConfigured;
   next();
 });
 
@@ -157,30 +156,6 @@ app.post('/auth/login', async (req, res, next) => {
     next(err);
   }
 });
-
-if (isGoogleConfigured) {
-  app.get(
-    '/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-  );
-
-  app.get(
-    '/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/auth/login' }),
-    (req, res) => {
-      if (!req.user || !req.user.display_name) {
-        if (!req.session.returnTo) {
-          req.session.returnTo = '/';
-        }
-        res.redirect('/profile/display-name');
-        return;
-      }
-      const redirectTo = req.session.returnTo || '/';
-      delete req.session.returnTo;
-      res.redirect(redirectTo);
-    }
-  );
-}
 
 app.post('/auth/logout', (req, res, next) => {
   req.logout(err => {
@@ -615,7 +590,40 @@ app.get('/:poetId/:bookId', (req, res) => {
     return res.status(404).render('404', { currentPath: null });
   }
 
-  res.render('book', { poet, book });
+  const pageSize = 30;
+  const sections = book.sections.slice(0, pageSize);
+  const totalSections = book.sections.length;
+
+  res.render('book', { poet, book, sections, totalSections });
+});
+
+// API endpoint for paginated book sections
+app.get('/api/books/:poetId/:bookId/sections', (req, res) => {
+  const { poetId, bookId } = req.params;
+  const page = parseInt(req.query.page, 10) || 1;
+  const pageSize = 30;
+  const data = loadPoems();
+
+  const poet = data.poets.find(p => p.id === poetId);
+  if (!poet) {
+    return res.status(404).json({ error: 'Poet not found' });
+  }
+
+  const book = poet.books.find(b => b.id === bookId);
+  if (!book) {
+    return res.status(404).json({ error: 'Book not found' });
+  }
+
+  const startIndex = (page - 1) * pageSize;
+  const sections = book.sections.slice(startIndex, startIndex + pageSize);
+  const hasMore = startIndex + pageSize < book.sections.length;
+
+  res.json({
+    sections,
+    page,
+    hasMore,
+    total: book.sections.length
+  });
 });
 
 app.get('/:poetId/:bookId/:sectionId', (req, res) => {

@@ -19,12 +19,27 @@
       <span><%= book.title %></span>
     </nav>
 
-    <section class="book">
+    <section class="book" data-poet-id="<%= poet.id %>" data-book-id="<%= book.id %>">
       <h2><%= book.title %></h2>
       <p class="poet">از <%= poet.name %></p>
 
-      <ul class="section-list">
-        <% book.sections.forEach(section => { %>
+      <div style="text-align: left;">
+        <button class="random-section-btn" id="random-section-btn"
+                data-section-ids='<%= JSON.stringify(book.sections.map(s => s.id)) %>'
+                data-poet-id="<%= poet.id %>"
+                data-book-id="<%= book.id %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="random-section-btn__icon">
+            <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/>
+            <path d="M20 2v4"/>
+            <path d="M22 4h-4"/>
+            <circle cx="4" cy="20" r="2"/>
+          </svg>
+          <span class="random-section-btn__text">فال شما</span>
+        </button>
+      </div>
+
+      <ul class="section-list" id="section-list" data-total-sections="<%= totalSections %>" data-current-page="1">
+        <% sections.forEach(section => { %>
           <li class="section-item">
             <a href="/<%= poet.id %>/<%= book.id %>/<%= section.id %>">
               <span><%= section.title %></span>
@@ -32,6 +47,13 @@
           </li>
         <% }); %>
       </ul>
+      
+      <div class="section-loader" id="section-loader" style="<%= totalSections <= sections.length ? 'display: none;' : '' %>">
+        <span class="section-loader__text">در حال بارگذاری...</span>
+        <span class="section-loader__progress">
+          <span id="loaded-count"><%= sections.length %></span> از <%= totalSections.toLocaleString('fa-IR') %>
+        </span>
+      </div>
     </section>
   </main>
 
@@ -40,4 +62,3 @@
   <script src="/client.js"></script>
 </body>
 </html>
-
