@@ -58,6 +58,18 @@ db.serialize(() => {
       FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     )
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS meditation_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      log_date TEXT NOT NULL,
+      note TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+      UNIQUE (user_id, log_date)
+    )
+  `);
 });
 
 function run(sql, params = []) {

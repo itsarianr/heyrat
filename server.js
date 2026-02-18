@@ -4,6 +4,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
+const jalaali = require('jalaali-js');
 const database = require('./db');
 const { passport, ensureAuthenticated } = require('./auth');
 const { run, get, all } = database;
@@ -576,6 +577,182 @@ app.get('/sitemap.xml', (req, res) => {
   res.send(xml);
 });
 
+// Meditation Tracker Routes - MUST come before dynamic routes
+
+// Helper function to get month data (used by both SSR and API)
+async function getMonthData(year, month, userId) {
+  // Get first day of Jalali month in Gregorian
+  const firstDayGregorian = jalaali.toGregorian(year, month, 1);
+  const startDate = new Date(firstDayGregorian.gy, firstDayGregorian.gm - 1, firstDayGregorian.gd);
+  
+  // Get last day of Jalali month
+  let lastDay;
+  if (month <= 6) {
+    lastDay = 31;
+  } else if (month <= 11) {
+    lastDay = 30;
+  } else {
+    lastDay = jalaali.isLeapJalaaliYear(year) ? 30 : 29;
+  }
+  const lastDayGregorian = jalaali.toGregorian(year, month, lastDay);
+  const endDate = new Date(lastDayGregorian.gy, lastDayGregorian.gm - 1, lastDayGregorian.gd);
+  
+  const startDateStr = startDate.toISOString().split('T')[0];
+  const endDateStr = endDate.toISOString().split('T')[0];
+  const todayStr = new Date().toISOString().split('T')[0];
+  
+  // Get all logs for this month
+  const logs = await all(
+    `SELECT user_id, log_date, note, created_at 
+     FROM meditation_logs 
+     WHERE log_date >= ? AND log_date <= ?`,
+    [startDateStr, endDateStr]
+  );
+  
+  // Get all users
+  const users = await all('SELECT id, display_name FROM users');
+  
+  // Build day data
+  const days = [];
+  const todayJDate = jalaali.toJalaali(new Date());
+  const isCurrentMonth = todayJDate.jy === year && todayJDate.jm === month;
+  
+  for (let day = 1; day <= lastDay; day++) {
+    const dayGregorian = jalaali.toGregorian(year, month, day);
+    const dayDate = new Date(dayGregorian.gy, dayGregorian.gm - 1, dayGregorian.gd);
+    const dateStr = dayDate.toISOString().split('T')[0];
+    
+    const dayLogs = logs.filter(l => l.log_date === dateStr);
+    const myLog = dayLogs.find(l => l.user_id === userId);
+    const friendLog = dayLogs.find(l => l.user_id !== userId);
+    
+    const isToday = dateStr === todayStr;
+    
+    days.push({
+      day,
+      date: dateStr,
+      hasMyLog: !!myLog,
+      hasFriendLog: !!friendLog,
+      myLog: myLog ? {
+        userId: myLog.user_id,
+        note: myLog.note,
+        createdAt: myLog.created_at
+      } : null,
+      friendLog: friendLog ? {
+        userId: friendLog.user_id,
+        note: friendLog.note,
+        createdAt: friendLog.created_at
+      } : null,
+      isToday
+    });
+  }
+  
+  return {
+    year,
+    month,
+    days,
+    users: users.map(u => ({ id: u.id, displayName: u.display_name })),
+    today: isCurrentMonth ? {
+      date: todayStr,
+      hasMyLog: !!logs.find(l => l.log_date === todayStr && l.user_id === userId),
+      hasFriendLog: !!logs.find(l => l.log_date === todayStr && l.user_id !== userId),
+      day: todayJDate.jd
+    } : null,
+    todayJalali: isCurrentMonth ? { year: todayJDate.jy, month: todayJDate.jm, day: todayJDate.jd } : null
+  };
+}
+
+// Helper functions for EJS templates
+function toPersianDigits(num) {
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  return num.toString().replace(/\d/g, d => persianDigits[parseInt(d)]);
+}
+
+function getMonthName(month) {
+  const names = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+  return names[month - 1];
+}
+
+// GET /meditation - Calendar page (SSR)
+app.get('/meditation', ensureAuthenticated, async (req, res, next) => {
+  try {
+    const now = new Date();
+    const jDate = jalaali.toJalaali(now);
+    const data = await getMonthData(jDate.jy, jDate.jm, req.user.id);
+    
+    res.render('meditation/index', { 
+      currentUser: req.user,
+      initialData: data,
+      currentYear: jDate.jy,
+      currentMonth: jDate.jm,
+      toPersianDigits,
+      getMonthName
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/meditation/current - Get current Jalali month info
+app.get('/api/meditation/current', ensureAuthenticated, (req, res) => {
+  const now = new Date();
+  const jDate = jalaali.toJalaali(now);
+  res.json({ year: jDate.jy, month: jDate.jm });
+});
+
+// GET /api/meditation/:year/:month - Get month data
+app.get('/api/meditation/:year/:month', ensureAuthenticated, async (req, res, next) => {
+  try {
+    const year = parseInt(req.params.year);
+    const month = parseInt(req.params.month);
+    const data = await getMonthData(year, month, req.user.id);
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/meditation - Log today
+app.post('/api/meditation', ensureAuthenticated, async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const todayStr = new Date().toISOString().split('T')[0];
+    const note = req.body.note ? req.body.note.trim().slice(0, 140) : null;
+    
+    await run(
+      `INSERT OR REPLACE INTO meditation_logs (user_id, log_date, note) VALUES (?, ?, ?)`,
+      [userId, todayStr, note]
+    );
+    
+    res.status(201).json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/meditation/:date - Remove log
+app.delete('/api/meditation/:date', ensureAuthenticated, async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const date = req.params.date;
+    
+    // Validate date format (YYYY-MM-DD)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return res.status(400).json({ error: 'Invalid date format' });
+    }
+    
+    await run(
+      `DELETE FROM meditation_logs WHERE user_id = ? AND log_date = ?`,
+      [userId, date]
+    );
+    
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Dynamic poetry routes come AFTER meditation routes
 app.get('/:poetId/:bookId', (req, res) => {
   const { poetId, bookId } = req.params;
   const data = loadPoems();

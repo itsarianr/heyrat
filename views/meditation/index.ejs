@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>مدیتیشن</title>
+  <link rel="stylesheet" href="/meditation.css">
+  <link rel="preload" href="/Ravi-VF.ttf" as="font" type="font/ttf" crossorigin>
+</head>
+<body>
+  <div class="meditation-container">
+    <header class="meditation-header">
+      <h1>
+        <svg class="header-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 11a2 2 0 1 1-4 0 4 4 0 0 1 8 0 6 6 0 0 1-12 0 8 8 0 0 1 16 0 10 10 0 1 1-20 0 11.93 11.93 0 0 1 2.42-7.22 2 2 0 1 1 3.16 2.44"/></svg>
+        تقویم مدیتیشن
+      </h1>
+    </header>
+
+    <div class="calendar-nav">
+      <button class="nav-btn" id="prevMonth">‹</button>
+      <h2 id="monthTitle"><%= initialData ? getMonthName(initialData.month) + ' ' + toPersianDigits(initialData.year) : '' %></h2>
+      <button class="nav-btn" id="nextMonth">›</button>
+    </div>
+
+    <div class="calendar">
+      <div class="weekdays">
+        <span>ش</span>
+        <span>ی</span>
+        <span>د</span>
+        <span>س</span>
+        <span>چ</span>
+        <span>پ</span>
+        <span>ج</span>
+      </div>
+      <div class="days" id="calendarDays">
+        <% if (initialData && initialData.days) { %>
+          <% initialData.days.forEach(function(day) { %>
+            <div class="day <%= day.isToday ? 'today' : '' %>">
+              <span class="day-number"><%= toPersianDigits(day.day) %></span>
+              <div class="day-icons">
+                <% if (day.myLog) { %>
+                  <div class="day-icon you" data-day="<%= day.day %>" data-user="<%= currentUser.id %>">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+                  </div>
+                <% } %>
+                
+                <% if (day.friendLog) { %>
+                  <div class="day-icon friend" data-day="<%= day.day %>" data-user="<%= day.friendLog.userId %>">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          <% }); %>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- User Guide - Only show users with logs -->
+    <div class="user-guide">
+      <% if (initialData && initialData.users) { %>
+        <% 
+          // Filter users who have at least one log in this month
+          const usersWithLogs = initialData.users.filter(function(user) {
+            return initialData.days.some(function(day) {
+              return (day.myLog && day.myLog.userId === user.id) || 
+                     (day.friendLog && day.friendLog.userId === user.id);
+            });
+          });
+        %>
+        <% usersWithLogs.forEach(function(user) { %>
+          <% const userClass = user.id === currentUser.id ? 'you' : 'friend'; %>
+          <div class="user-guide-item">
+            <svg class="user-guide-icon <%= userClass %>" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+            <span class="user-guide-name <%= userClass %>"><%= user.displayName %></span>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+
+  </div>
+
+  <!-- Fixed Bottom Button -->
+  <div class="fixed-bottom-btn" id="fixedBottomBtn">
+    <% if (initialData && initialData.today && initialData.today.hasMyLog) { %>
+      <button class="btn-primary btn-fullwidth btn-disabled" id="submitLogBtn" disabled>قبلاً برای امروز ثبت شده</button>
+    <% } else { %>
+      <button class="btn-primary btn-fullwidth" id="submitLogBtn">ثبت مدیتیشن امروز</button>
+    <% } %>
+  </div>
+
+  <!-- Log Detail Bottom Sheet -->
+  <div class="bottom-sheet-overlay" id="bottomSheetOverlay"></div>
+  <div class="bottom-sheet" id="bottomSheet">
+    <div class="bottom-sheet-header">
+      <h3 id="sheetTitle">جزئیات مدیتیشن</h3>
+      <button class="bottom-sheet-close" id="closeSheet">×</button>
+    </div>
+    <div class="log-detail">
+      <div class="log-detail-label">تاریخ و زمان</div>
+      <div class="log-detail-value" id="sheetDateTime"></div>
+    </div>
+    <div class="log-detail">
+      <div class="log-detail-label">کاربر</div>
+      <div class="log-detail-value" id="sheetUser"></div>
+    </div>
+    <div class="log-note" id="sheetNoteContainer" style="display: none;">
+      <div class="log-note-label">یادداشت</div>
+      <div class="log-note-text" id="sheetNote"></div>
+    </div>
+    <div class="log-actions" id="sheetActions" style="display: none; margin-top: 16px;">
+      <button class="btn-text-delete" id="deleteLogBtn">حذف</button>
+    </div>
+  </div>
+
+  <!-- Submit Log Bottom Sheet -->
+  <div class="bottom-sheet-overlay" id="submitSheetOverlay"></div>
+  <div class="bottom-sheet" id="submitSheet">
+    <div class="bottom-sheet-header">
+      <h3>ثبت مدیتیشن</h3>
+      <button class="bottom-sheet-close" id="closeSubmitSheet">×</button>
+    </div>
+    <div class="submit-text">
+      <p>شما در حال ثبت مدیتیشن برای تاریخ <strong id="submitDate"></strong> هستید.</p>
+    </div>
+    <div class="note-input-container">
+      <textarea id="submitNoteText" placeholder="یادداشت (اختیاری)" maxlength="140" rows="3"></textarea>
+    </div>
+    <div class="submit-actions">
+      <button class="btn-primary btn-fullwidth" id="confirmSubmitBtn">ثبت مدیتیشن</button>
+    </div>
+  </div>
+
+  <script>
+    // Helper functions
+    function toPersianDigits(num) {
+      const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      return num.toString().replace(/\d/g, d => persianDigits[parseInt(d)]);
+    }
+
+    function getMonthName(month) {
+      const names = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+      return names[month - 1];
+    }
+
+    function formatTime(dateString) {
+      const date = new Date(dateString);
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${toPersianDigits(hours)}:${toPersianDigits(minutes)}`;
+    }
+
+    // Initial data from server
+    let currentYear = <%= currentYear || 'null' %>;
+    let currentMonth = <%= currentMonth || 'null' %>;
+    let todayData = <%- initialData && initialData.today ? JSON.stringify(initialData.today) : 'null' %>;
+    let currentUsers = <%- initialData && initialData.users ? JSON.stringify(initialData.users) : '[]' %>;
+    let currentDays = <%- initialData && initialData.days ? JSON.stringify(initialData.days) : '[]' %>;
+    let selectedLogDate = null;
+    const currentUserId = <%= currentUser ? currentUser.id : 'null' %>;
+
+    // Store initial today data separately so it doesn't get lost when switching months
+    const initialTodayData = todayData;
+
+    async function loadMonth(year, month) {
+      try {
+        const response = await fetch(`/api/meditation/${year}/${month}`);
+        const data = await response.json();
+
+        currentYear = year;
+        currentMonth = month;
+        currentUsers = data.users;
+        currentDays = data.days;
+        // Only update todayData if we're viewing the current month (data.today is not null)
+        // Otherwise keep the original todayData so submit button state remains correct
+        if (data.today) {
+          todayData = data.today;
+        }
+
+        document.getElementById('monthTitle').textContent = `${getMonthName(month)} ${toPersianDigits(year)}`;
+
+        updateCalendar(data.days);
+        updateUserGuide(data.days, data.users);
+        updateSubmitButton();
+      } catch (err) {
+        console.error('Error loading month:', err);
+      }
+    }
+
+    function updateCalendar(days) {
+      const container = document.getElementById('calendarDays');
+      container.innerHTML = '';
+
+      days.forEach(day => {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'day' + (day.isToday ? ' today' : '');
+
+        const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>';
+
+        let iconsHtml = '';
+
+        if (day.myLog) {
+          iconsHtml += `<div class="day-icon you" data-day="${day.day}" data-user="${currentUserId}">
+            ${checkIcon}
+          </div>`;
+        }
+
+        if (day.friendLog) {
+          iconsHtml += `<div class="day-icon friend" data-day="${day.day}" data-user="${day.friendLog.userId}">
+            ${checkIcon}
+          </div>`;
+        }
+
+        dayEl.innerHTML = `
+          <span class="day-number">${toPersianDigits(day.day)}</span>
+          <div class="day-icons">${iconsHtml}</div>
+        `;
+        
+        dayEl.querySelectorAll('.day-icon').forEach(icon => {
+          icon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dayNum = parseInt(icon.dataset.day);
+            const userId = parseInt(icon.dataset.user);
+            const dayData = currentDays.find(d => d.day === dayNum);
+            if (dayData) {
+              showLogDetail(dayData, userId);
+            }
+          });
+        });
+        
+        container.appendChild(dayEl);
+      });
+    }
+
+    function updateUserGuide(days, users) {
+      // Filter users who have at least one log in this month
+      const usersWithLogs = users.filter(user => {
+        return days.some(day => 
+          (day.myLog && day.myLog.userId === user.id) || 
+          (day.friendLog && day.friendLog.userId === user.id)
+        );
+      });
+
+      const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>';
+      
+      const guideHtml = usersWithLogs.map(user => {
+        const userClass = user.id === currentUserId ? 'you' : 'friend';
+        return `
+          <div class="user-guide-item">
+            <svg class="user-guide-icon ${userClass}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+            <span class="user-guide-name ${userClass}">${user.displayName}</span>
+          </div>
+        `;
+      }).join('');
+      
+      document.querySelector('.user-guide').innerHTML = guideHtml;
+    }
+
+    function updateSubmitButton() {
+      const btn = document.getElementById('submitLogBtn');
+      if (todayData && todayData.hasMyLog) {
+        btn.textContent = 'قبلاً برای امروز ثبت شده';
+        btn.disabled = true;
+        btn.classList.add('btn-disabled');
+      } else {
+        btn.textContent = 'ثبت مدیتیشن امروز';
+        btn.disabled = false;
+        btn.classList.remove('btn-disabled');
+      }
+    }
+
+    function showLogDetail(dayData, userId) {
+      const user = currentUsers.find(u => u.id === userId);
+      const userName = user ? user.displayName : 'کاربر';
+
+      let log = null;
+      if (dayData.myLog && dayData.myLog.userId === userId) {
+        log = dayData.myLog;
+      } else if (dayData.friendLog && dayData.friendLog.userId === userId) {
+        log = dayData.friendLog;
+      }
+
+      const dateTimeStr = log
+        ? `${toPersianDigits(currentYear)}/${toPersianDigits(currentMonth)}/${toPersianDigits(dayData.day)} · ${formatTime(log.createdAt)}`
+        : `${toPersianDigits(currentYear)}/${toPersianDigits(currentMonth)}/${toPersianDigits(dayData.day)}`;
+
+      document.getElementById('sheetDateTime').textContent = dateTimeStr;
+      document.getElementById('sheetUser').textContent = userName;
+
+      const actionsDiv = document.getElementById('sheetActions');
+
+      if (log) {
+        selectedLogDate = dayData.date;
+        
+        const noteContainer = document.getElementById('sheetNoteContainer');
+        const noteText = document.getElementById('sheetNote');
+        if (log.note) {
+          noteText.textContent = log.note;
+          noteContainer.style.display = 'block';
+        } else {
+          noteContainer.style.display = 'none';
+        }
+        
+        if (userId === currentUserId) {
+          actionsDiv.style.display = 'block';
+        } else {
+          actionsDiv.style.display = 'none';
+        }
+      } else {
+        document.getElementById('sheetNoteContainer').style.display = 'none';
+        actionsDiv.style.display = 'none';
+      }
+      
+      openBottomSheet();
+    }
+
+    function openBottomSheet() {
+      document.getElementById('bottomSheetOverlay').classList.add('open');
+      document.getElementById('bottomSheet').classList.add('open');
+    }
+
+    function closeBottomSheet() {
+      document.getElementById('bottomSheetOverlay').classList.remove('open');
+      document.getElementById('bottomSheet').classList.remove('open');
+      selectedLogDate = null;
+    }
+
+    function openSubmitSheet() {
+      const dateStr = `${toPersianDigits(todayData ? todayData.day || 1 : 1)}-${toPersianDigits(currentMonth)}-${toPersianDigits(currentYear)}`;
+      document.getElementById('submitDate').textContent = dateStr;
+      document.getElementById('submitNoteText').value = '';
+      
+      document.getElementById('submitSheetOverlay').classList.add('open');
+      document.getElementById('submitSheet').classList.add('open');
+    }
+
+    function closeSubmitSheet() {
+      document.getElementById('submitSheetOverlay').classList.remove('open');
+      document.getElementById('submitSheet').classList.remove('open');
+    }
+
+    async function submitTodayLog() {
+      const note = document.getElementById('submitNoteText').value.trim();
+      
+      try {
+        const response = await fetch('/api/meditation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note })
+        });
+        
+        if (response.ok) {
+          closeSubmitSheet();
+          loadMonth(currentYear, currentMonth);
+        }
+      } catch (err) {
+        console.error('Error logging:', err);
+      }
+    }
+
+    async function deleteLog() {
+      if (!selectedLogDate) return;
+      
+      try {
+        const response = await fetch(`/api/meditation/${selectedLogDate}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          closeBottomSheet();
+          loadMonth(currentYear, currentMonth);
+        }
+      } catch (err) {
+        console.error('Error deleting log:', err);
+      }
+    }
+
+    // Add click handlers to server-rendered day icons
+    document.querySelectorAll('.day-icon').forEach(icon => {
+      icon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dayNum = parseInt(icon.dataset.day);
+        const userId = parseInt(icon.dataset.user);
+        const dayData = currentDays.find(d => d.day === dayNum);
+        if (dayData) {
+          showLogDetail(dayData, userId);
+        }
+      });
+    });
+
+    // Event listeners
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      let newMonth = currentMonth - 1;
+      let newYear = currentYear;
+      if (newMonth < 1) {
+        newMonth = 12;
+        newYear--;
+      }
+      loadMonth(newYear, newMonth);
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      let newMonth = currentMonth + 1;
+      let newYear = currentYear;
+      if (newMonth > 12) {
+        newMonth = 1;
+        newYear++;
+      }
+      loadMonth(newYear, newMonth);
+    });
+
+    // Fixed bottom button
+    document.getElementById('submitLogBtn').addEventListener('click', () => {
+      if (!todayData || !todayData.hasMyLog) {
+        openSubmitSheet();
+      }
+    });
+
+    // Submit sheet
+    document.getElementById('confirmSubmitBtn').addEventListener('click', submitTodayLog);
+    document.getElementById('closeSubmitSheet').addEventListener('click', closeSubmitSheet);
+    document.getElementById('submitSheetOverlay').addEventListener('click', closeSubmitSheet);
+
+    // Detail sheet
+    document.getElementById('deleteLogBtn').addEventListener('click', deleteLog);
+    document.getElementById('closeSheet').addEventListener('click', closeBottomSheet);
+    document.getElementById('bottomSheetOverlay').addEventListener('click', closeBottomSheet);
+  </script>
+</body>
+</html>
