@@ -579,6 +579,17 @@ app.get('/sitemap.xml', (req, res) => {
 
 // Meditation Tracker Routes - MUST come before dynamic routes
 
+// Helper function to get today's date in YYYY-MM-DD format using local timezone
+function getTodayString() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+// Helper function to convert Date to YYYY-MM-DD in local timezone
+function dateToLocalString(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 // Helper function to get month data (used by both SSR and API)
 async function getMonthData(year, month, userId) {
   // Get first day of Jalali month in Gregorian
@@ -597,9 +608,9 @@ async function getMonthData(year, month, userId) {
   const lastDayGregorian = jalaali.toGregorian(year, month, lastDay);
   const endDate = new Date(lastDayGregorian.gy, lastDayGregorian.gm - 1, lastDayGregorian.gd);
   
-  const startDateStr = startDate.toISOString().split('T')[0];
-  const endDateStr = endDate.toISOString().split('T')[0];
-  const todayStr = new Date().toISOString().split('T')[0];
+  const startDateStr = dateToLocalString(startDate);
+  const endDateStr = dateToLocalString(endDate);
+  const todayStr = getTodayString();
   
   // Get all logs for this month
   const logs = await all(
@@ -612,21 +623,25 @@ async function getMonthData(year, month, userId) {
   // Get all users
   const users = await all('SELECT id, display_name FROM users');
   
-  // Build day data
+  // Build day data - use CONSISTENT method for calculating today
   const days = [];
-  const todayJDate = jalaali.toJalaali(new Date());
+  const now = new Date();
+  // Parse todayStr to get year, month, day for jalaali conversion
+  const [gy, gm, gd] = todayStr.split('-').map(Number);
+  const todayJDate = jalaali.toJalaali(gy, gm, gd);
   const isCurrentMonth = todayJDate.jy === year && todayJDate.jm === month;
   
   for (let day = 1; day <= lastDay; day++) {
     const dayGregorian = jalaali.toGregorian(year, month, day);
     const dayDate = new Date(dayGregorian.gy, dayGregorian.gm - 1, dayGregorian.gd);
-    const dateStr = dayDate.toISOString().split('T')[0];
+    // Use local date string instead of toISOString() to avoid UTC conversion
+    const dateStr = dateToLocalString(dayDate);
     
     const dayLogs = logs.filter(l => l.log_date === dateStr);
     const myLog = dayLogs.find(l => l.user_id === userId);
     const friendLog = dayLogs.find(l => l.user_id !== userId);
     
-    const isToday = dateStr === todayStr;
+    const isToday = isCurrentMonth && day === todayJDate.jd;
     
     days.push({
       day,
@@ -676,8 +691,9 @@ function getMonthName(month) {
 // GET /meditation - Calendar page (SSR)
 app.get('/meditation', ensureAuthenticated, async (req, res, next) => {
   try {
-    const now = new Date();
-    const jDate = jalaali.toJalaali(now);
+    const todayStr = getTodayString();
+    const [gy, gm, gd] = todayStr.split('-').map(Number);
+    const jDate = jalaali.toJalaali(gy, gm, gd);
     const data = await getMonthData(jDate.jy, jDate.jm, req.user.id);
     
     res.render('meditation/index', { 
@@ -695,8 +711,9 @@ app.get('/meditation', ensureAuthenticated, async (req, res, next) => {
 
 // GET /api/meditation/current - Get current Jalali month info
 app.get('/api/meditation/current', ensureAuthenticated, (req, res) => {
-  const now = new Date();
-  const jDate = jalaali.toJalaali(now);
+  const todayStr = getTodayString();
+  const [gy, gm, gd] = todayStr.split('-').map(Number);
+  const jDate = jalaali.toJalaali(gy, gm, gd);
   res.json({ year: jDate.jy, month: jDate.jm });
 });
 
@@ -716,8 +733,9 @@ app.get('/api/meditation/:year/:month', ensureAuthenticated, async (req, res, ne
 app.post('/api/meditation', ensureAuthenticated, async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const todayStr = new Date().toISOString().split('T')[0];
     const note = req.body.note ? req.body.note.trim().slice(0, 140) : null;
+    
+    const todayStr = getTodayString();
     
     await run(
       `INSERT OR REPLACE INTO meditation_logs (user_id, log_date, note) VALUES (?, ?, ?)`,
