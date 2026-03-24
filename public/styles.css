@@ -354,6 +354,39 @@ main { min-height: 60vh; }
   vertical-align: bottom;
 }
 
+/* Mobile back button */
+.mobile-back-btn {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  .mobile-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--theme-text) 10%, transparent);
+    color: var(--theme-text);
+    text-decoration: none;
+    margin-left: 8px;
+    margin-right: 4px;
+    vertical-align: middle;
+    transition: background 0.15s ease;
+  }
+  .mobile-back-btn:hover {
+    background: color-mix(in srgb, var(--theme-text) 20%, transparent);
+  }
+  .mobile-back-btn:active {
+    background: color-mix(in srgb, var(--theme-text) 30%, transparent);
+  }
+  .mobile-back-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 /* --- Index page styles --- */
 .poet-section {
   margin-bottom: 40px;
