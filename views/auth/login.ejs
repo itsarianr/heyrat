@@ -4,46 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <%- include('../partials/header', { includePwaMeta: true }) %>
-  <title>ورود به حیران</title>
+  <title>ورود - Heyraan</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <%- include('../partials/header') %>
 
   <main class="auth-page">
-    <section class="auth-card">
-      <h2 class="auth-card__title">ساخت حساب کاربری</h2>
-      <p class="auth-card__subtitle">
-        برای اشتراک‌گذاری نوشته‌های خود درباره ابیات، ایمیل‌تان را وارد کنید. فعلاً نیازی به تأیید ایمیل نیست.
-      </p>
+    <h2 class="auth-title">ورود به حساب</h2>
+    <p class="auth-subtitle">ایمیل خود را وارد کنید تا به حساب کاربری‌تان در حیران وارد شوید.</p>
 
-      <% if (errors && errors.length > 0) { %>
-        <ul class="auth-card__errors">
-          <% errors.forEach(error => { %>
-            <li><%= error %></li>
-          <% }); %>
-        </ul>
-      <% } %>
+    <% if (errors && errors.length > 0) { %>
+      <ul class="auth-errors">
+        <% errors.forEach(error => { %>
+          <li><%= error %></li>
+        <% }); %>
+      </ul>
+    <% } %>
 
-      <form class="auth-form" action="/auth/login" method="POST" novalidate>
-        <label class="auth-form__label" for="loginEmailInput">ایمیل</label>
-        <input
-          id="loginEmailInput"
-          name="email"
-          type="email"
-          class="auth-form__input"
-          value="<%= values && values.email ? values.email : '' %>"
-          required
-          autocomplete="email"
-          placeholder="example@email.com"
-        />
-        <button type="submit" class="btn btn--primary auth-form__submit">
-          ادامه
-        </button>
-      </form>
-
-
-    </section>
+    <form class="auth-form" action="/auth/login" method="POST" novalidate>
+      <input
+        id="loginEmailInput"
+        name="email"
+        type="email"
+        class="auth-input"
+        value="<%= values && values.email ? values.email : '' %>"
+        required
+        autocomplete="email"
+        placeholder="arian@gmail.com"
+        dir="ltr"
+      />
+      <button type="submit" class="btn btn--primary auth-submit">
+        ادامه
+      </button>
+    </form>
   </main>
 
   <%- include('../partials/footer') %>

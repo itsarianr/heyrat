@@ -4,59 +4,55 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <%- include('../partials/header', { includePwaMeta: true }) %>
-  <title>نام نمایشی - حیران</title>
+  <title>نام نمایشی - Heyraan</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <%- include('../partials/header') %>
 
   <main class="auth-page">
-    <section class="auth-card">
-      <h2 class="auth-card__title">
-        <% if (hasDisplayName) { %>
-          تغییر نام نمایشی
-        <% } else { %>
-          انتخاب نام نمایشی
-        <% } %>
-      </h2>
-      <p class="auth-card__subtitle">
-        نامی را انتخاب کن که در کنار نوشته‌هایت نمایش داده شود.
-      </p>
-
-      <% if (errors && errors.length > 0) { %>
-        <ul class="auth-card__errors">
-          <% errors.forEach(error => { %>
-            <li><%= error %></li>
-          <% }); %>
-        </ul>
+    <h2 class="auth-title">
+      <% if (hasDisplayName) { %>
+        تغییر نام
+      <% } else { %>
+        انتخاب نام
       <% } %>
+    </h2>
+    <p class="auth-subtitle">این نام در کنار نوشته‌هایت نمایش داده می‌شود</p>
 
-      <form method="POST" action="/profile/display-name" class="auth-form">
-        <label class="auth-form__label" for="displayNameInput">نام نمایشی</label>
-        <input
-          id="displayNameInput"
-          name="displayName"
-          type="text"
-          class="auth-form__input"
-          value="<%= values && values.displayName ? values.displayName : '' %>"
-          placeholder="بهتر است فارسی باشد"
-          required
-          maxlength="40"
-          minlength="2"
-        />
-        <button type="submit" class="btn btn--primary auth-form__submit">
-          ذخیره
+    <% if (errors && errors.length > 0) { %>
+      <ul class="auth-errors">
+        <% errors.forEach(error => { %>
+          <li><%= error %></li>
+        <% }); %>
+      </ul>
+    <% } %>
+
+    <form method="POST" action="/profile/display-name" class="auth-form">
+      <input
+        id="displayNameInput"
+        name="displayName"
+        type="text"
+        class="auth-input"
+        value="<%= values && values.displayName ? values.displayName : (currentUser && currentUser.display_name ? currentUser.display_name : '') %>"
+        placeholder="نام نمایشی"
+        required
+        maxlength="40"
+        minlength="2"
+        dir="rtl"
+      />
+      <button type="submit" class="btn btn--primary auth-submit">
+        ذخیره
+      </button>
+    </form>
+
+    <% if (hasDisplayName) { %>
+      <form action="/auth/logout" method="POST" style="margin-top: 12px;">
+        <button type="submit" class="auth-link-btn">
+          خروج از حساب
         </button>
       </form>
-
-      <% if (hasDisplayName) { %>
-        <form class="auth-form__logout" action="/auth/logout" method="POST" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid color-mix(in srgb, var(--theme-text) 15%, transparent);">
-          <button type="submit" class="btn btn--ghost" style="width: 100%;">
-            خروج
-          </button>
-        </form>
-      <% } %>
-    </section>
+    <% } %>
   </main>
 
   <%- include('../partials/footer') %>

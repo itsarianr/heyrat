@@ -1,26 +1,28 @@
 <% if (typeof includePwaMeta !== 'undefined' && includePwaMeta) { %>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="حیران - مجموعه اشعار پارسی">
+<meta name="apple-mobile-web-app-title" content="Heyraan">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="حیران - مجموعه اشعار پارسی">
+<meta name="application-name" content="Heyraan">
 <meta name="theme-color" content="#1d1837">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/icon.svg">
 <link rel="preload" href="/Ravi-VF.ttf" as="font" type="font/ttf" crossorigin>
-<meta property="og:site_name" content="حیران - مجموعه اشعار پارسی">
+<meta property="og:site_name" content="Heyraan">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://heyraan.com">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "حیران - مجموعه اشعار پارسی",
-  "alternateName": ["حیران", "heyraan.com"],
+  "name": "Heyraan",
+  "alternateName": ["Heyraan", "حیران", "heyraan.com"],
   "url": "https://heyraan.com"
 }
 </script>
 <% } else { %>
 <header>
+  <% // Clarity disabled temporarily %>
+  <% /* %>
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
       c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -28,6 +30,7 @@
       y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "u2dut8w37e");
   </script>
+  <% */ %>
 
   <div class="color-picker" id="color-picker" style="display: none;">
     <div class="color-options" id="color-options"></div>
@@ -35,7 +38,14 @@
 
   <div class="header-content">
     <div class="header-title-section">
-      <h1><a href="/">حیران</a></h1>
+      <h1>
+        <svg class="header-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+          <path d="m3.3 7 8.7 5 8.7-5"/>
+          <path d="M12 22V12"/>
+        </svg>
+        <a href="/">حیران</a>
+      </h1>
       <p class="subtitle">مجموعه اشعار فارسی</p>
     </div>
     <nav class="header-nav">

@@ -1152,6 +1152,18 @@
       item.addEventListener('click', (e) => {
         e.stopPropagation();
         const action = item.dataset.action;
+
+        if (action === 'font-decrease' || action === 'font-increase') {
+          // Font controls should not close the menu
+          if (action === 'font-decrease') {
+            adjustFontSize(-0.15);
+          } else if (action === 'font-increase') {
+            adjustFontSize(0.15);
+          }
+          return;
+        }
+
+        // Close menu for other actions
         closeMenu();
 
         if (action === 'screenshot') {
@@ -1188,6 +1200,38 @@
         closeMenu();
       }
     });
+  }
+
+  // ----- Font Size Controls -----
+  const FONT_SIZE_KEY = 'heyraan-font-size';
+  const FONT_SIZE_MIN = 0.7;
+  const FONT_SIZE_MAX = 2;
+  const FONT_SIZE_STEP = 0.15;
+
+  function getVerseElements() {
+    return document.querySelectorAll('.verse, .focus-mode .verse');
+  }
+
+  function applyFontSize(size) {
+    const verses = getVerseElements();
+    verses.forEach(verse => {
+      verse.style.fontSize = size + 'em';
+    });
+  }
+
+  function adjustFontSize(delta) {
+    const currentSize = parseFloat(localStorage.getItem(FONT_SIZE_KEY)) || 1;
+    let newSize = currentSize + delta;
+    newSize = Math.max(FONT_SIZE_MIN, Math.min(FONT_SIZE_MAX, newSize));
+    localStorage.setItem(FONT_SIZE_KEY, newSize);
+    applyFontSize(newSize);
+  }
+
+  function initFontSize() {
+    const savedSize = localStorage.getItem(FONT_SIZE_KEY);
+    if (savedSize) {
+      applyFontSize(parseFloat(savedSize));
+    }
   }
 
   // ----- Section List Pagination (API-based Lazy Loading) -----
@@ -1352,6 +1396,7 @@
     initCoupletSelection(postSheet);
     initFeedInteractions();
     initPoemFabMenu();
+    initFontSize();
     initFocusMode();
     initSectionPagination();
     initRandomSectionButton();
