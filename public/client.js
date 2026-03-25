@@ -1380,6 +1380,168 @@
     });
   }
 
+  // ----- Book Search -----
+  function initBookSearch() {
+    const searchIconBtn = document.getElementById('search-icon-btn');
+    const searchBottomSheet = document.getElementById('search-bottom-sheet');
+    const searchCloseBtn = document.getElementById('search-close-btn');
+    const searchInput = document.getElementById('book-search-input');
+    const searchResults = document.getElementById('search-results');
+    const bookSection = document.querySelector('.book');
+    
+    if (!searchIconBtn || !searchBottomSheet || !searchInput || !bookSection) return;
+
+    const poetId = bookSection.dataset.poetId;
+    const bookId = bookSection.dataset.bookId;
+
+    let debounceTimer;
+    let currentResults = [];
+    let currentPage = 1;
+    let isLoadingMore = false;
+    let hasMore = false;
+
+    function openSearch() {
+      searchBottomSheet.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      const bottomNav = document.querySelector('.bottom-nav');
+      if (bottomNav) bottomNav.style.display = 'none';
+      showEmptyState();
+      setTimeout(() => searchInput.focus(), 100);
+    }
+
+    function closeSearch() {
+      searchBottomSheet.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      const bottomNav = document.querySelector('.bottom-nav');
+      if (bottomNav) bottomNav.style.display = '';
+      searchInput.value = '';
+      showEmptyState();
+    }
+
+    function showEmptyState() {
+      searchResults.innerHTML = `
+        <div class="search-empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="search-empty-state__icon">
+            <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+            <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+            <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+            <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+            <circle cx="12" cy="12" r="3"/>
+            <path d="m16 16-1.9-1.9"/>
+          </svg>
+          <p class="search-empty-state__text">هر چیز که در جستن آنی</p>
+        </div>
+      `;
+    }
+
+    function highlightMatch(text, query) {
+      if (!query) return text;
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return text.replace(regex, '<strong>$1</strong>');
+    }
+
+    function renderResults(results) {
+      if (results.length === 0) {
+        searchResults.innerHTML = '<div class="search-no-results">نتیجه‌ای یافت نشد</div>';
+        return;
+      }
+
+      const html = results.map(result => {
+        const item = result.item;
+        const query = searchInput.value;
+        
+        if (item.type === 'title') {
+          return `
+            <a href="/${poetId}/${bookId}/${item.sectionId}" class="search-result-item search-result-title">
+              <span class="search-result-content">${highlightMatch(item.sectionTitle, query)}</span>
+            </a>
+          `;
+        }
+        
+        return `
+          <a href="/${poetId}/${bookId}/${item.sectionId}" class="search-result-item search-result-couplet">
+            <span class="search-result-content">${highlightMatch(item.content, query)}</span>
+            <span class="search-result-section">${highlightMatch(item.sectionTitle, query)}</span>
+          </a>
+        `;
+      }).join('');
+
+      if (currentPage > 1) {
+        searchResults.innerHTML += html;
+      } else {
+        searchResults.innerHTML = html;
+      }
+    }
+
+    async function performSearch(query, page = 1) {
+      if (page === 1) {
+        currentResults = [];
+        searchResults.innerHTML = '<div class="search-loading">در حال جستجو...</div>';
+      } else {
+        searchResults.insertAdjacentHTML('beforeend', '<div class="search-loading-spinner"></div>');
+      }
+
+      try {
+        const response = await fetch(`/api/books/${poetId}/${bookId}/search?q=${encodeURIComponent(query)}&page=${page}`);
+        const data = await response.json();
+
+        if (data.results) {
+          currentResults = [...currentResults, ...data.results];
+          hasMore = data.hasMore;
+          currentPage = data.page;
+          renderResults(currentResults);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        searchResults.innerHTML = '<div class="search-error">خطا در جستجو</div>';
+      } finally {
+        isLoadingMore = false;
+        const spinner = searchResults.querySelector('.search-loading-spinner');
+        if (spinner) spinner.remove();
+      }
+    }
+
+    function handleInput() {
+      const query = searchInput.value.trim();
+      
+      clearTimeout(debounceTimer);
+      
+      if (!query) {
+        searchResults.innerHTML = '';
+        return;
+      }
+      
+      debounceTimer = setTimeout(() => {
+        performSearch(query, 1);
+      }, 300);
+    }
+
+    let scrollThrottle = false;
+    function handleScroll() {
+      if (scrollThrottle || !searchInput.value.trim() || !hasMore || isLoadingMore) return;
+      
+      const { scrollTop, scrollHeight, clientHeight } = searchResults;
+      
+      if (scrollTop + clientHeight >= scrollHeight - 150) {
+        isLoadingMore = true;
+        scrollThrottle = true;
+        setTimeout(() => { scrollThrottle = false; }, 300);
+        performSearch(searchInput.value.trim(), currentPage + 1);
+      }
+    }
+
+    searchIconBtn.addEventListener('click', openSearch);
+    searchCloseBtn.addEventListener('click', closeSearch);
+    searchBottomSheet.querySelector('.search-bottom-sheet__backdrop').addEventListener('click', closeSearch);
+    searchInput.addEventListener('input', handleInput);
+    searchResults.addEventListener('scroll', handleScroll, { passive: true });
+  }
+
+  // ----- Highlight Search Result -----
+  function initHighlightedCouplet() {
+    // Disabled for now - scroll and highlight not working
+  }
+
   function onReady(fn) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', fn);
@@ -1400,6 +1562,8 @@
     initFocusMode();
     initSectionPagination();
     initRandomSectionButton();
+    initBookSearch();
+    initHighlightedCouplet();
 
     // Check for draft and auto-publish if user is authenticated and has display name
     // Also check URL params for draft flag (after login/display-name)

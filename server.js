@@ -821,6 +821,70 @@ app.get('/api/books/:poetId/:bookId/sections', (req, res) => {
   });
 });
 
+// Search API endpoint
+app.get('/api/books/:poetId/:bookId/search', (req, res) => {
+  const { poetId, bookId } = req.params;
+  const query = req.query.q || '';
+  const page = parseInt(req.query.page, 10) || 1;
+  const pageSize = 10;
+
+  if (!query.trim()) {
+    return res.json({ results: [], total: 0, page: 1, hasMore: false });
+  }
+
+  const data = loadPoems();
+  const poet = data.poets.find(p => p.id === poetId);
+  if (!poet) {
+    return res.status(404).json({ error: 'Poet not found' });
+  }
+
+  const book = poet.books.find(b => b.id === bookId);
+  if (!book) {
+    return res.status(404).json({ error: 'Book not found' });
+  }
+
+  const searchItems = [];
+  book.sections.forEach((section, sectionIndex) => {
+    searchItems.push({
+      type: 'title',
+      sectionId: section.id,
+      sectionTitle: section.title,
+      sectionIndex,
+      content: section.title,
+      coupletIndex: -1
+    });
+
+    section.couplets.forEach((couplet, coupletIndex) => {
+      const coupletText = couplet.join(' ');
+      searchItems.push({
+        type: 'couplet',
+        sectionId: section.id,
+        sectionTitle: section.title,
+        sectionIndex,
+        content: coupletText,
+        coupletIndex
+      });
+    });
+  });
+
+  const results = searchItems
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => item.content.toLowerCase().includes(query.toLowerCase()));
+
+  const total = results.length;
+  const startIndex = (page - 1) * pageSize;
+  const paginatedResults = results.slice(startIndex, startIndex + pageSize);
+  const hasMore = startIndex + pageSize < total;
+
+  res.json({
+    results: paginatedResults,
+    total,
+    page,
+    hasMore,
+    query
+  });
+});
+
 app.get('/:poetId/:bookId/:sectionId', (req, res) => {
   const { poetId, bookId, sectionId } = req.params;
   const data = loadPoems();

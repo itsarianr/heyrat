@@ -28,7 +28,13 @@
       <h2><%= book.title %></h2>
       <p class="poet">از <%= poet.name %></p>
 
-      <div style="text-align: left;">
+      <div style="text-align: left; display: flex; gap: 8px;">
+        <button class="search-icon-btn" id="search-icon-btn" aria-label="جستجو">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
+        </button>
         <button class="random-section-btn" id="random-section-btn"
                 data-section-ids='<%= JSON.stringify(book.sections.map(s => s.id)) %>'
                 data-poet-id="<%= poet.id %>"
@@ -41,6 +47,22 @@
           </svg>
           <span class="random-section-btn__text">فال شما</span>
         </button>
+      </div>
+
+      <div id="search-bottom-sheet" class="search-bottom-sheet" aria-hidden="true">
+        <div class="search-bottom-sheet__backdrop"></div>
+        <div class="search-bottom-sheet__panel">
+          <div class="search-bottom-sheet__header">
+            <input type="text" id="book-search-input" class="book-search-input" placeholder="جستجو در این کتاب..." autofocus>
+            <button class="search-bottom-sheet__close" id="search-close-btn" aria-label="بستن">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6 6 18"/>
+                <path d="m6 6 12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div id="search-results" class="search-results"></div>
+        </div>
       </div>
 
       <ul class="section-list" id="section-list" data-total-sections="<%= totalSections %>" data-current-page="1">
