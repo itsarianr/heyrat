@@ -531,6 +531,10 @@ app.get('/favorites', (req, res) => {
   res.render('favorites', { currentPath: '/favorites' });
 });
 
+app.get('/search', (req, res) => {
+  res.render('search', { currentPath: '/search' });
+});
+
 app.get('/sitemap.xml', (req, res) => {
   // Sitemap should always point to the canonical production domain
   const baseUrl = 'https://heyraan.com';
@@ -770,6 +774,92 @@ app.delete('/api/meditation/:date', ensureAuthenticated, async (req, res, next) 
   }
 });
 
+// Search API routes
+app.get('/api/search/poets', (req, res) => {
+  const data = loadPoems();
+  const poets = data.poets.map(p => ({
+    id: p.id,
+    name: p.name
+  }));
+  res.json({ poets });
+});
+
+app.get('/api/search/:poetId/books', (req, res) => {
+  const { poetId } = req.params;
+  const data = loadPoems();
+  const poet = data.poets.find(p => p.id === poetId);
+  if (!poet) {
+    return res.json({ books: [] });
+  }
+  const books = poet.books.map(b => ({
+    id: b.id,
+    title: b.title
+  }));
+  res.json({ books });
+});
+
+app.get('/api/search', (req, res) => {
+  const query = req.query.q || '';
+  const poetId = req.query.poetId;
+  const bookId = req.query.bookId;
+  const page = parseInt(req.query.page, 10) || 1;
+  const pageSize = 20;
+
+  if (!query.trim()) {
+    return res.json({ results: [], total: 0, page: 1, hasMore: false });
+  }
+
+  const data = loadPoems();
+  let poets = data.poets;
+
+  if (poetId) {
+    poets = poets.filter(p => p.id === poetId);
+  }
+
+  const searchItems = [];
+  poets.forEach(poet => {
+    let books = poet.books;
+    if (bookId) {
+      books = books.filter(b => b.id === bookId);
+    }
+
+    books.forEach(book => {
+      book.sections.forEach(section => {
+        section.couplets.forEach((couplet, coupletIndex) => {
+          const matchesVerse = couplet.some(verse => 
+            verse.toLowerCase().includes(query.toLowerCase())
+          );
+          if (matchesVerse) {
+            searchItems.push({
+              poetId: poet.id,
+              poetName: poet.name,
+              bookId: book.id,
+              bookTitle: book.title,
+              sectionId: section.id,
+              sectionTitle: section.title,
+              verses: couplet,
+              coupletIndex
+            });
+          }
+        });
+      });
+    });
+  });
+
+  const total = searchItems.length;
+  const startIndex = (page - 1) * pageSize;
+  const paginatedResults = searchItems.slice(startIndex, startIndex + pageSize);
+  const hasMore = startIndex + pageSize < total;
+
+  res.json({
+    results: paginatedResults,
+    total,
+    page,
+    hasMore,
+    query
+  });
+});
+
 // Dynamic poetry routes come AFTER meditation routes
 app.get('/:poetId/:bookId', (req, res) => {
   const { poetId, bookId } = req.params;
@@ -818,70 +908,6 @@ app.get('/api/books/:poetId/:bookId/sections', (req, res) => {
     page,
     hasMore,
     total: book.sections.length
-  });
-});
-
-// Search API endpoint
-app.get('/api/books/:poetId/:bookId/search', (req, res) => {
-  const { poetId, bookId } = req.params;
-  const query = req.query.q || '';
-  const page = parseInt(req.query.page, 10) || 1;
-  const pageSize = 10;
-
-  if (!query.trim()) {
-    return res.json({ results: [], total: 0, page: 1, hasMore: false });
-  }
-
-  const data = loadPoems();
-  const poet = data.poets.find(p => p.id === poetId);
-  if (!poet) {
-    return res.status(404).json({ error: 'Poet not found' });
-  }
-
-  const book = poet.books.find(b => b.id === bookId);
-  if (!book) {
-    return res.status(404).json({ error: 'Book not found' });
-  }
-
-  const searchItems = [];
-  book.sections.forEach((section, sectionIndex) => {
-    searchItems.push({
-      type: 'title',
-      sectionId: section.id,
-      sectionTitle: section.title,
-      sectionIndex,
-      content: section.title,
-      coupletIndex: -1
-    });
-
-    section.couplets.forEach((couplet, coupletIndex) => {
-      const coupletText = couplet.join(' ');
-      searchItems.push({
-        type: 'couplet',
-        sectionId: section.id,
-        sectionTitle: section.title,
-        sectionIndex,
-        content: coupletText,
-        coupletIndex
-      });
-    });
-  });
-
-  const results = searchItems
-    .map((item, index) => ({ item, index }))
-    .filter(({ item }) => item.content.toLowerCase().includes(query.toLowerCase()));
-
-  const total = results.length;
-  const startIndex = (page - 1) * pageSize;
-  const paginatedResults = results.slice(startIndex, startIndex + pageSize);
-  const hasMore = startIndex + pageSize < total;
-
-  res.json({
-    results: paginatedResults,
-    total,
-    page,
-    hasMore,
-    query
   });
 });
 

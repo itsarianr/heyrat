@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <%- include('partials/header', { includePwaMeta: true }) %>
+  <title>جستجو - حیران</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <main class="global-search">
+    <div class="global-search__header">
+      <input 
+        type="text" 
+        id="global-search-input" 
+        class="global-search__input" 
+        placeholder="جست‌وجو در شعرها…"
+        autocomplete="off"
+      />
+      <div class="global-search__filters">
+        <select id="global-poet-select" class="global-search__select">
+          <option value="">همهٔ شاعران</option>
+        </select>
+        <select id="global-book-select" class="global-search__select" disabled>
+          <option value="">همهٔ کتاب‌ها</option>
+        </select>
+      </div>
+    </div>
+    
+    <div id="global-search-results" class="global-search__results">
+      <div class="global-search__empty">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="global-search__empty-icon">
+          <path d="M21 5H3"/>
+          <path d="M10 12H3"/>
+          <path d="M10 19H3"/>
+          <circle cx="17" cy="15" r="3"/>
+          <path d="m21 19-1.9-1.9"/>
+        </svg>
+        <p>هر چیز که در جستن آنی</p>
+      </div>
+    </div>
+    
+    <div id="global-search-sentinel" class="global-search__sentinel"></div>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <script src="/client.js"></script>
+  <script>
+    (function() {
+      const searchInput = document.getElementById('global-search-input');
+      const poetSelect = document.getElementById('global-poet-select');
+      const bookSelect = document.getElementById('global-book-select');
+      const resultsContainer = document.getElementById('global-search-results');
+
+      let currentResults = [];
+      let currentPage = 1;
+      let hasMore = false;
+      let isLoadingMore = false;
+      let debounceTimer;
+      const sentinel = document.getElementById('global-search-sentinel');
+
+      function highlightMatch(text, query) {
+        if (!query) return text;
+        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')})`, 'gi');
+        return text.replace(regex, '<strong>$1</strong>');
+      }
+
+      function renderResults(results) {
+        if (results.length === 0) {
+          resultsContainer.innerHTML = '<div class="global-search__no-results">نتیجه‌ای یافت نشد</div>';
+          return;
+        }
+
+        const query = searchInput.value;
+        const html = results.map(item => {
+          const versesHtml = item.verses.map(verse => 
+            `<span class="global-search-couplet-line">${highlightMatch(verse, query)}</span>`
+          ).join('');
+          
+          return `
+            <a href="/${item.poetId}/${item.bookId}/${item.sectionId}" class="global-search-result-item">
+              <div class="global-search-couplets">${versesHtml}</div>
+              <div class="global-search-result-meta">
+                <span class="global-search-poet-name">${item.poetName}</span>
+                <span class="global-search-separator">•</span>
+                <span class="global-search-book-title">${item.bookTitle}</span>
+                <span class="global-search-separator">•</span>
+                <span class="global-search-section-title">${item.sectionTitle}</span>
+              </div>
+            </a>
+          `;
+        }).join('');
+
+        if (currentPage > 1) {
+          resultsContainer.insertAdjacentHTML('beforeend', html);
+        } else {
+          resultsContainer.innerHTML = html;
+        }
+      }
+
+      async function performSearch(query, page = 1) {
+        if (page === 1) {
+          currentResults = [];
+          resultsContainer.innerHTML = '';
+        }
+
+        isLoadingMore = true;
+        updateLoadingSpinner(true);
+        const poetId = poetSelect.value;
+        const bookId = bookSelect.value;
+
+        try {
+          let url = `/api/search?q=${encodeURIComponent(query)}&page=${page}`;
+          if (poetId) url += `&poetId=${poetId}`;
+          if (bookId) url += `&bookId=${bookId}`;
+
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.results) {
+            currentResults = [...currentResults, ...data.results];
+            hasMore = data.hasMore;
+            currentPage = data.page;
+            renderResults(currentResults);
+          }
+        } catch (error) {
+          console.error('Search error:', error);
+          if (page === 1) {
+            resultsContainer.innerHTML = '<div class="global-search__error">خطا در جستجو</div>';
+          }
+        } finally {
+          isLoadingMore = false;
+          updateLoadingSpinner(false);
+        }
+      }
+
+      function updateLoadingSpinner(show) {
+        if (show) {
+          sentinel.innerHTML = '<div class="global-search__loader"><div class="global-search__loading-spinner"></div></div>';
+        } else {
+          sentinel.innerHTML = '';
+        }
+      }
+
+      function handleSearch() {
+        const query = searchInput.value.trim();
+        if (!query) {
+          resultsContainer.innerHTML = `
+            <div class="global-search__empty">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="global-search__empty-icon">
+                <path d="M21 5H3"/>
+                <path d="M10 12H3"/>
+                <path d="M10 19H3"/>
+                <circle cx="17" cy="15" r="3"/>
+                <path d="m21 19-1.9-1.9"/>
+              </svg>
+              <p>هر چیز که در جستن آنی</p>
+            </div>
+          `;
+          return;
+        }
+        currentPage = 1;
+        performSearch(query, 1);
+      }
+
+      function debounceSearch() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(handleSearch, 500);
+      }
+
+      async function loadPoets() {
+        try {
+          const response = await fetch('/api/search/poets');
+          const data = await response.json();
+          
+          const options = data.poets.map(poet => 
+            `<option value="${poet.id}">${poet.name}</option>`
+          ).join('');
+          
+          poetSelect.insertAdjacentHTML('beforeend', options);
+        } catch (error) {
+          console.error('Failed to load poets:', error);
+        }
+      }
+
+      async function loadBooks(poetId) {
+        bookSelect.innerHTML = '<option value="">همهٔ کتاب‌ها</option>';
+        
+        if (!poetId) {
+          bookSelect.disabled = true;
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/search/${poetId}/books`);
+          const data = await response.json();
+          
+          const options = data.books.map(book => 
+            `<option value="${book.id}">${book.title}</option>`
+          ).join('');
+          
+          bookSelect.insertAdjacentHTML('beforeend', options);
+          bookSelect.disabled = false;
+        } catch (error) {
+          console.error('Failed to load books:', error);
+          bookSelect.disabled = true;
+        }
+      }
+
+      // Event listeners
+      searchInput.addEventListener('input', debounceSearch);
+      
+      poetSelect.addEventListener('change', () => {
+        loadBooks(poetSelect.value).then(() => {
+          handleSearch();
+        });
+      });
+      
+      bookSelect.addEventListener('change', handleSearch);
+
+      // Infinite scroll
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          const query = searchInput.value.trim();
+          if (query) {
+            performSearch(query, currentPage + 1);
+          }
+        }
+      }, { threshold: 0.1 });
+
+      if (sentinel) {
+        observer.observe(sentinel);
+      }
+
+      // Initialize
+      loadPoets();
+    })();
+  </script>
+</body>
+</html>
