@@ -81,7 +81,7 @@
           ).join('');
           
           return `
-            <a href="/${item.poetId}/${item.bookId}/${item.sectionId}" class="global-search-result-item">
+            <a href="/${item.poetId}/${item.bookId}/${item.sectionId}?highlight=${item.coupletIndex}" class="global-search-result-item">
               <div class="global-search-couplets">${versesHtml}</div>
               <div class="global-search-result-meta">
                 <span class="global-search-poet-name">${item.poetName}</span>

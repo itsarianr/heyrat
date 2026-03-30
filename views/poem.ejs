@@ -232,6 +232,34 @@
     }
   </script>
   <script src="/client.js"></script>
+  <script>
+    function handleHighlight() {
+      const params = new URLSearchParams(window.location.search);
+      const highlightIndex = params.get('highlight');
+      
+      if (!highlightIndex) return;
+      
+      // Only look in normal couplets, not focus mode
+      const couplet = document.querySelector('#normal-couplets [data-couplet-index="' + highlightIndex + '"]');
+      if (!couplet) return;
+      
+      couplet.classList.add('couplet--highlighted');
+      
+      setTimeout(function() {
+        couplet.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+      
+      setTimeout(function() {
+        couplet.classList.remove('couplet--highlighted');
+      }, 5000);
+    }
+    
+    if (document.readyState === 'loading') {
+      window.addEventListener('load', handleHighlight);
+    } else {
+      handleHighlight();
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" async></script>
 </body>
 </html>

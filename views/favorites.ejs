@@ -25,6 +25,15 @@
 
   <script src="/client.js"></script>
   <script>
+    function applyFontSize() {
+      const savedSize = localStorage.getItem('heyraan-font-size');
+      if (savedSize) {
+        document.querySelectorAll('.verse').forEach(function(verse) {
+          verse.style.fontSize = savedSize + 'em';
+        });
+      }
+    }
+
     function renderFavorites() {
       const favorites = window.Favorites.getFavorites();
       const container = document.getElementById('favorites-list');
@@ -52,7 +61,7 @@
       container.innerHTML = sortedFavorites.map(({ id, data }) => {
         const url = `/${data.poetId}/${data.bookId}/${data.sectionId}`;
         return `
-          <div class="favorite-card">
+          <a href="${url}" class="favorite-card">
             <div class="favorite-couplet">
               <p class="verse verse-first">${data.verses[0]}</p>
               <p class="verse verse-second">${data.verses[1]}</p>
@@ -61,11 +70,15 @@
               <span>${data.poetName}</span>
               <span class="separator">•</span>
               <span class="book-title">${data.bookTitle}</span>
+              <svg class="favorite-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+              </svg>
             </div>
-            <a href="${url}" class="favorite-link">مشاهده شعر</a>
-          </div>
+          </a>
         `;
       }).join('');
+      
+      applyFontSize();
     }
 
     if (document.readyState === 'loading') {

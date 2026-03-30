@@ -1184,17 +1184,27 @@ main h2 {
   margin-top: 30px;
 }
 .favorite-card {
+  display: block;
+  position: relative;
   border: 1px solid var(--theme-text);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
   background: var(--theme-bg);
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, opacity 0.2s ease;
   opacity: 0.8;
+  text-decoration: none;
+  color: inherit;
 }
 .favorite-card:hover {
   box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-text) 15%, transparent);
   opacity: 1;
+}
+.favorite-arrow {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  opacity: 0.5;
 }
 .favorite-title {
   font-size: 1.3em;
@@ -1225,7 +1235,6 @@ main h2 {
   font-size: 0.9em;
   color: var(--theme-text);
   opacity: 0.7;
-  margin-bottom: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2101,7 +2110,7 @@ footer {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 120px);
-  padding: 16px;
+  padding: 4px 12px;
 }
 
 .global-search__header {
@@ -2135,10 +2144,11 @@ footer {
 .global-search__filters {
   display: flex;
   gap: 8px;
+  width: 100%;
 }
 
 .global-search__select {
-  flex: 1;
+  width: 50%;
   padding: 10px 32px 10px 12px;
   font-size: 0.9rem;
   font-family: 'Ravi', 'Arial', sans-serif;
@@ -2258,13 +2268,17 @@ footer {
   font-weight: 700;
 }
 
-/* Highlighted Couplet from Search - disabled */
-/* .couplet--highlighted { */
-/* } */
+/* Highlighted Couplet from Search */
+.couplet.couplet--highlighted {
+  background-color: color-mix(in srgb, #888 15%, transparent);
+  outline: 3px solid color-mix(in srgb, #888 15%, transparent);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
 
 /* Profile Experimental Section */
 .profile-experimental {
-  margin-top: 150px;
+  margin-top: 100px;
   width: 100%;
   padding: 0;
   box-sizing: border-box;
