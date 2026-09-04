@@ -2,10 +2,10 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const session = require('express-session');
 const jalaali = require('jalaali-js');
 const database = require('./db');
+const poems = require('./poems');
 const { passport, ensureAuthenticated } = require('./auth');
 const { run, get, all } = database;
 
@@ -37,67 +37,20 @@ app.use((req, res, next) => {
   next();
 });
 
-function loadPoems() {
-  const dataPath = path.join(__dirname, 'data');
-  const poets = [];
-  
-  const poetFolders = fs.readdirSync(dataPath, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name);
-  
-  for (const poetFolder of poetFolders) {
-    const poetPath = path.join(dataPath, poetFolder);
-    const bookFiles = fs.readdirSync(poetPath)
-      .filter(file => file.endsWith('.json'));
-    
-    const books = bookFiles.map(bookFile => {
-      const bookPath = path.join(poetPath, bookFile);
-      const bookData = JSON.parse(fs.readFileSync(bookPath, 'utf-8'));
-      return bookData;
-    });
-    
-    if (books.length > 0) {
-      // Extract poet ID from directory name (remove numeric prefix like "01-")
-      const poetId = poetFolder.replace(/^\d+-/, '');
-      poets.push({
-        id: poetId,
-        name: books[0].poet.name,
-        books: books
-      });
-    }
-  }
-  
-  return { poets };
-}
-
-function getSectionData(poetId, bookId, sectionId) {
-  const data = loadPoems();
-
-  const poet = data.poets.find(p => p.id === poetId);
-  if (!poet) {
-    return null;
+function maybeRedirectPoetry(req, res, poetId, bookId, sectionId) {
+  if (poems.isCanonicalPath(poetId, sectionId)) {
+    return false;
   }
 
-  const book = poet.books.find(b => b.id === bookId);
-  if (!book) {
-    return null;
-  }
-
-  if (typeof sectionId === 'undefined') {
-    return { poet, book, section: null };
-  }
-
-  const section = book.sections.find(s => s.id === sectionId);
-  if (!section) {
-    return null;
-  }
-
-  return { poet, book, section };
+  const location = poems.canonicalPath(poetId, bookId, sectionId);
+  const queryIndex = req.url.indexOf('?');
+  const query = queryIndex >= 0 ? req.url.slice(queryIndex) : '';
+  res.redirect(301, location + query);
+  return true;
 }
 
 app.get('/', (req, res) => {
-  const data = loadPoems();
-  res.render('index', { data, currentPath: '/' });
+  res.render('index', { data: poems.data, currentPath: '/' });
 });
 
 app.get('/auth/login', (req, res) => {
@@ -246,7 +199,7 @@ app.post('/api/posts', ensureAuthenticated, async (req, res, next) => {
       return;
     }
 
-    const sectionData = getSectionData(poetId, bookId, sectionId);
+    const sectionData = poems.getSection(poetId, bookId, sectionId);
     if (!sectionData || !sectionData.section) {
       res.status(404).json({ error: 'شعر انتخاب‌شده در سایت یافت نشد.' });
       return;
@@ -547,9 +500,7 @@ app.get('/sitemap.xml', (req, res) => {
     { path: '/profile/display-name', changefreq: 'monthly', priority: '0.4' }
   ];
 
-  const data = loadPoems();
-
-  data.poets.forEach(poet => {
+  poems.data.poets.forEach(poet => {
     poet.books.forEach(book => {
       urls.push({
         path: `/${poet.id}/${book.id}`,
@@ -776,7 +727,7 @@ app.delete('/api/meditation/:date', ensureAuthenticated, async (req, res, next) 
 
 // Search API routes
 app.get('/api/search/poets', (req, res) => {
-  const data = loadPoems();
+  const data = poems.data;
   const poets = data.poets.map(p => ({
     id: p.id,
     name: p.name
@@ -786,7 +737,7 @@ app.get('/api/search/poets', (req, res) => {
 
 app.get('/api/search/:poetId/books', (req, res) => {
   const { poetId } = req.params;
-  const data = loadPoems();
+  const data = poems.data;
   const poet = data.poets.find(p => p.id === poetId);
   if (!poet) {
     return res.json({ books: [] });
@@ -809,7 +760,7 @@ app.get('/api/search', (req, res) => {
     return res.json({ results: [], total: 0, page: 1, hasMore: false });
   }
 
-  const data = loadPoems();
+  const data = poems.data;
   let poets = data.poets;
 
   if (poetId) {
@@ -863,23 +814,22 @@ app.get('/api/search', (req, res) => {
 // Dynamic poetry routes come AFTER meditation routes
 app.get('/:poetId/:bookId', (req, res) => {
   const { poetId, bookId } = req.params;
-  const data = loadPoems();
-
-  const poet = data.poets.find(p => p.id === poetId);
-  if (!poet) {
+  const found = poems.getBook(poetId, bookId);
+  if (!found) {
     return res.status(404).render('404', { currentPath: null });
   }
 
-  const book = poet.books.find(b => b.id === bookId);
-  if (!book) {
-    return res.status(404).render('404', { currentPath: null });
+  if (maybeRedirectPoetry(req, res, poetId, bookId)) {
+    return;
   }
 
+  const { poet, book } = found;
   const pageSize = 30;
-  const sections = book.sections.slice(0, pageSize);
+  const sections = poems.summarizeSections(book.sections.slice(0, pageSize));
   const totalSections = book.sections.length;
+  const sectionIds = book.sections.map(section => section.id);
 
-  res.render('book', { poet, book, sections, totalSections });
+  res.render('book', { poet, book, sections, totalSections, sectionIds });
 });
 
 // API endpoint for paginated book sections
@@ -887,24 +837,18 @@ app.get('/api/books/:poetId/:bookId/sections', (req, res) => {
   const { poetId, bookId } = req.params;
   const page = parseInt(req.query.page, 10) || 1;
   const pageSize = 30;
-  const data = loadPoems();
-
-  const poet = data.poets.find(p => p.id === poetId);
-  if (!poet) {
+  const found = poems.getBook(poetId, bookId);
+  if (!found) {
     return res.status(404).json({ error: 'Poet not found' });
   }
 
-  const book = poet.books.find(b => b.id === bookId);
-  if (!book) {
-    return res.status(404).json({ error: 'Book not found' });
-  }
-
+  const { book } = found;
   const startIndex = (page - 1) * pageSize;
-  const sections = book.sections.slice(startIndex, startIndex + pageSize);
+  const pageSections = book.sections.slice(startIndex, startIndex + pageSize);
   const hasMore = startIndex + pageSize < book.sections.length;
 
   res.json({
-    sections,
+    sections: poems.summarizeSections(pageSections),
     page,
     hasMore,
     total: book.sections.length
@@ -913,24 +857,16 @@ app.get('/api/books/:poetId/:bookId/sections', (req, res) => {
 
 app.get('/:poetId/:bookId/:sectionId', (req, res) => {
   const { poetId, bookId, sectionId } = req.params;
-  const data = loadPoems();
-  
-  const poet = data.poets.find(p => p.id === poetId);
-  if (!poet) {
+  const found = poems.getSection(poetId, bookId, sectionId);
+  if (!found || !found.section) {
     return res.status(404).render('404', { currentPath: null });
   }
-  
-  const book = poet.books.find(b => b.id === bookId);
-  if (!book) {
-    return res.status(404).render('404', { currentPath: null });
+
+  if (maybeRedirectPoetry(req, res, poetId, bookId, sectionId)) {
+    return;
   }
-  
-  const section = book.sections.find(s => s.id === sectionId);
-  if (!section) {
-    return res.status(404).render('404', { currentPath: null });
-  }
-  
-  res.render('poem', { poet, book, section });
+
+  res.render('poem', { poet: found.poet, book: found.book, section: found.section });
 });
 
 // 404 handler - keep last, after all routes

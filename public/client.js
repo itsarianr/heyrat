@@ -160,8 +160,12 @@
     }
 
     let mutated = false;
-    Object.values(parsed).forEach(entry => {
-      if (entry && !entry.sectionId && entry.poemId) {
+    const next = {};
+
+    Object.entries(parsed).forEach(([id, entry]) => {
+      if (!entry) return;
+
+      if (!entry.sectionId && entry.poemId) {
         entry.sectionId = entry.poemId;
         if (!entry.sectionTitle && entry.poemTitle) {
           entry.sectionTitle = entry.poemTitle;
@@ -170,10 +174,34 @@
         delete entry.poemTitle;
         mutated = true;
       }
+
+      let poetId = entry.poetId;
+      let sectionId = entry.sectionId;
+      if (poetId === 'moulana') {
+        poetId = 'moulavi';
+        mutated = true;
+      }
+      if (typeof sectionId === 'string') {
+        const sectionMatch = /^section(\d+)$/.exec(sectionId);
+        if (sectionMatch) {
+          sectionId = `sh${sectionMatch[1]}`;
+          mutated = true;
+        }
+      }
+
+      const coupletIndex = entry.coupletIndex;
+      const newId =
+        poetId && entry.bookId && sectionId != null && coupletIndex != null
+          ? `${poetId}-${entry.bookId}-${sectionId}-${coupletIndex}`
+          : id;
+      if (newId !== id) mutated = true;
+
+      next[newId] = Object.assign({}, entry, { poetId, sectionId });
     });
 
     if (mutated) {
-      saveFavorites(parsed);
+      saveFavorites(next);
+      return next;
     }
 
     return parsed;
