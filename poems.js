@@ -15,6 +15,20 @@ function canonicalSectionId(sectionId) {
   return match ? `sh${match[1]}` : sectionId;
 }
 
+// Strip harakat (َُِّْ etc.) and normalize common letter variants so
+// "اول دفتر" matches "اوّلِ دفتر".
+function normalizePersian(text) {
+  if (typeof text !== 'string') return '';
+  return text
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
+    .replace(/\u200C/g, '')
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/ة/g, 'ه')
+    .replace(/ك/g, 'ک')
+    .replace(/ي/g, 'ی')
+    .toLowerCase();
+}
+
 function loadPoemsFromDisk() {
   const dataPath = path.join(__dirname, 'data');
   const poets = [];
@@ -134,6 +148,7 @@ module.exports = {
   getBook,
   getSection,
   summarizeSections,
+  normalizePersian,
   canonicalPoetId,
   canonicalSectionId,
   canonicalPath,

@@ -760,6 +760,11 @@ app.get('/api/search', (req, res) => {
     return res.json({ results: [], total: 0, page: 1, hasMore: false });
   }
 
+  const normalizedQuery = poems.normalizePersian(query);
+  if (!normalizedQuery) {
+    return res.json({ results: [], total: 0, page: 1, hasMore: false });
+  }
+
   const data = poems.data;
   let poets = data.poets;
 
@@ -777,8 +782,8 @@ app.get('/api/search', (req, res) => {
     books.forEach(book => {
       book.sections.forEach(section => {
         section.couplets.forEach((couplet, coupletIndex) => {
-          const matchesVerse = couplet.some(verse => 
-            verse.toLowerCase().includes(query.toLowerCase())
+          const matchesVerse = couplet.some(verse =>
+            poems.normalizePersian(verse).includes(normalizedQuery)
           );
           if (matchesVerse) {
             searchItems.push({

@@ -611,7 +611,8 @@
     const fab = document.getElementById('poem-fab');
     const hint = document.getElementById('selection-hint');
     const couplets = document.querySelectorAll('.couplet');
-    const poetName = document.querySelector('main nav span:nth-child(3)')?.textContent?.trim() || '';
+    const poemEl = document.querySelector('.poem');
+    const poetName = poemEl?.dataset.poetName?.trim() || '';
 
     if (!screenshotBtn || !doneBtn || couplets.length === 0) return;
 
